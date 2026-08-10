@@ -281,6 +281,9 @@ function renderProdukteTabelle(produkte) {
                             formatNumber(p.ysize) + ' &times; ' +
                             formatNumber(p.zsize) + ' mm' : '-'}
             </td>
+            <td class="mono" style="font-size: 11px;">
+                ${escapeHtml(p.variablen_typ) || '-'}
+            </td>
             <td>
                 <span class="${getStatusBadgeClass(p.status)}">${escapeHtml(p.status)}</span>
             </td>
@@ -298,12 +301,14 @@ function renderProdukteTabelle(produkte) {
 }
 
 /**
- * Filtert die Produktliste nach Suchbegriff und Status.
+ * Filtert die Produktliste nach Suchbegriff, Status und Variablen-Typ.
  * Wird bei jeder Aenderung der Filter aufgerufen.
  */
 function filterProdukte() {
     const suchbegriff = document.getElementById('suche').value.toLowerCase();
     const statusFilter = document.getElementById('status-filter').value;
+    const varFilter = document.getElementById('var-filter') ?
+        document.getElementById('var-filter').value : '';
 
     let gefiltert = window.alleProdukte || [];
 
@@ -320,7 +325,101 @@ function filterProdukte() {
         gefiltert = gefiltert.filter(p => p.status === statusFilter);
     }
 
+    // Nach Variablen-Typ filtern
+    if (varFilter) {
+        if (varFilter === 'keine') {
+            gefiltert = gefiltert.filter(p => !p.variablen_typ);
+        } else {
+            gefiltert = gefiltert.filter(p =>
+                p.variablen_typ && p.variablen_typ.startsWith(varFilter));
+        }
+    }
+
     renderProdukteTabelle(gefiltert);
+}
+
+
+// =====================================================================
+// 3b. CSV-EXPORT
+// =====================================================================
+// Beschluss 10.08.2026: Mo will die Produktliste fuer Werner / Sanjeev
+// als CSV exportieren koennen. CSV oeffnet sich direkt in Excel.
+// Alle Produkte (nicht nur die gefilterten) werden exportiert.
+
+
+/**
+ * Exportiert alle Produkte als CSV-Datei.
+ * Datei heisst: alpa_produkte_YYYY-MM-DD.csv
+ * Oeffnet sich direkt in Excel ohne Konvertierung.
+ */
+function exportCSV() {
+    const produkte = window.alleProdukte || [];
+    if (produkte.length === 0) {
+        alert('Keine Produkte zum Exportieren vorhanden.');
+        return;
+    }
+
+    // CSV-Header (Spaltenueberschriften)
+    const headers = [
+        'Bezeichnung',
+        'ASE-Materialnr',
+        'Material',
+        'Lackierung',
+        'Nutzen',
+        'LP-Breite (mm)',
+        'LP-Hoehe (mm)',
+        'LP-Dicke (mm)',
+        'Variablen-Typ',
+        'DMC-Struktur',
+        'Status',
+        'Erfasst am',
+        'Erfasser'
+    ];
+
+    // Hilfsfunktion: CSV-Wert quoten (Komma/Anfuehrungszeichen escapen)
+    function csvVal(v) {
+        if (v === null || v === undefined) return '';
+        const s = String(v);
+        if (s.includes(',') || s.includes('"') || s.includes('\n')) {
+            return '"' + s.replace(/"/g, '""') + '"';
+        }
+        return s;
+    }
+
+    // Zeilen bauen
+    const rows = produkte.map(p => [
+        csvVal(p.bezeichnung),
+        csvVal(p.ase_materialnr),
+        csvVal(p.material),
+        csvVal(p.lacquer),
+        csvVal(p.nutzen),
+        csvVal(p.xsize),
+        csvVal(p.ysize),
+        csvVal(p.zsize),
+        csvVal(p.variablen_typ),
+        csvVal(p.dmc_struktur),
+        csvVal(p.status),
+        csvVal(p.erstellt_am ? new Date(p.erstellt_am).toLocaleDateString('de-CH') : ''),
+        csvVal(p.erfasser)
+    ].join(','));
+
+    // CSV-Datei zusammenbauen (mit BOM fuer Excel Umlaut-Erkennung)
+    const csv = '\ufeff' + headers.join(',') + '\n' + rows.join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+
+    // Datum fuer Dateinamen
+    const today = new Date().toISOString().split('T')[0];
+    const filename = 'alpa_produkte_' + today + '.csv';
+
+    // Download ausloesen
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
 }
 
 

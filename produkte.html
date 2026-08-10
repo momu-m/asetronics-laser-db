@@ -44,7 +44,7 @@
             Konvertierte Laser-3-Programme. Klicke auf eine Zeile fuer Details und Download.
         </p>
 
-        <!-- Toolbar: Suche + Filter -->
+        <!-- Toolbar: Suche + Filter + Export -->
         <div class="toolbar">
             <div class="toolbar-search">
                 <input
@@ -60,6 +60,17 @@
                 <option value="freigegeben">Freigegeben</option>
                 <option value="gesperrt">Gesperrt</option>
             </select>
+            <select id="var-filter" class="toolbar-select" onchange="filterProdukte()">
+                <option value="">Alle Variablen</option>
+                <option value="rawcode-single">rawcode-single</option>
+                <option value="rawcode-single-WWYY">rawcode-single-WWYY</option>
+                <option value="rawcode-set">rawcode-set</option>
+                <option value="UNBEKANNT">Unbekannt / Spezial</option>
+                <option value="keine">Ohne Zuordnung</option>
+            </select>
+            <button class="btn btn-secondary btn-sm" onclick="exportCSV()" title="Alle Produkte als CSV exportieren">
+                CSV Export
+            </button>
         </div>
 
         <!-- Meldungen -->
@@ -75,12 +86,13 @@
                             <th>ASE-Materialnr.</th>
                             <th>Material</th>
                             <th>LP-Masse (B &times; H &times; D)</th>
+                            <th>Variable</th>
                             <th>Status</th>
                             <th>Erfasst</th>
                         </tr>
                     </thead>
                     <tbody id="produkte-table-body">
-                        <tr><td colspan="6" class="loading-state">Lade Programme...</td></tr>
+                        <tr><td colspan="7" class="loading-state">Lade Programme...</td></tr>
                     </tbody>
                 </table>
             </div>
