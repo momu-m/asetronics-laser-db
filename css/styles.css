@@ -959,3 +959,291 @@ td.mono { font-family: var(--font-mono); font-size: 12px; }
         width: 100%;
     }
 }
+
+
+/* =====================================================================
+   NEU 10.08.2026: Rechner & Planer (rechner.html)
+   ===================================================================== */
+
+/* ----- Tab-Navigation ----- */
+.rechner-tabs {
+    display: flex;
+    gap: 4px;
+    border-bottom: 2px solid var(--as-border);
+    margin-bottom: 24px;
+}
+
+.rechner-tab {
+    padding: 10px 18px;
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    color: var(--as-text-muted);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-bottom: -2px;
+    font-family: inherit;
+}
+
+.rechner-tab:hover {
+    color: var(--as-text);
+    background: var(--as-surface-hover);
+}
+
+.rechner-tab.active {
+    color: var(--as-primary);
+    border-bottom-color: var(--as-primary);
+    font-weight: 600;
+}
+
+/* ----- Sections (nur active ist sichtbar) ----- */
+.rechner-section {
+    display: none;
+}
+
+.rechner-section.active {
+    display: block;
+}
+
+/* ----- 2-Spalten Layout (Eingabe links, Ergebnis rechts) ----- */
+.rechner-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+}
+
+@media (max-width: 900px) {
+    .rechner-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.rechner-section-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--as-text);
+    margin: 0 0 8px 0;
+}
+
+.rechner-hint {
+    font-size: 13px;
+    color: var(--as-text-muted);
+    margin: 0 0 16px 0;
+    line-height: 1.5;
+}
+
+/* ----- Formular-Zeilen (zwei Felder nebeneinander) ----- */
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+/* ----- DMC-Baukasten-Tabelle ----- */
+.dmc-tabelle {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.dmc-tabelle th {
+    text-align: left;
+    padding: 8px 10px;
+    background: var(--as-surface-hover);
+    color: var(--as-text-muted);
+    font-weight: 600;
+    border-bottom: 1px solid var(--as-border);
+}
+
+.dmc-tabelle td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--as-border);
+    vertical-align: middle;
+}
+
+.dmc-tabelle input[type="number"] {
+    width: 60px;
+    padding: 4px 6px;
+    border: 1px solid var(--as-border);
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+}
+
+.dmc-tabelle input[type="text"] {
+    width: 100%;
+    padding: 4px 6px;
+    border: 1px solid var(--as-border);
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 12px;
+}
+
+.dmc-tabelle input[type="checkbox"] {
+    transform: scale(1.2);
+    cursor: pointer;
+}
+
+/* ----- Modus-Umschalter (Radio) ----- */
+.rechner-modus {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+    font-size: 13px;
+}
+
+.rechner-modus label {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* ----- Ergebnis-Bloecke ----- */
+.dmc-ergebnis {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.dmc-result-block {
+    padding: 14px 16px;
+    background: var(--as-surface);
+    border: 1px solid var(--as-border);
+    border-left: 4px solid var(--as-accent);
+    border-radius: 6px;
+}
+
+.dmc-result-label {
+    font-size: 11px;
+    color: var(--as-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 4px;
+    font-weight: 600;
+}
+
+.dmc-result-value {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--as-primary);
+    font-family: var(--font-mono);
+}
+
+.dmc-result-sub {
+    font-size: 12px;
+    color: var(--as-text-muted);
+    margin-top: 4px;
+}
+
+.dmc-cleartext {
+    display: block;
+    padding: 10px 12px;
+    background: #f5f6f8;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    color: var(--as-text);
+    word-break: break-all;
+    white-space: pre-wrap;
+}
+
+.dmc-beispiel {
+    display: block;
+    padding: 10px 12px;
+    background: #e6f4ff;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 14px;
+    color: var(--as-primary);
+    font-weight: 600;
+    letter-spacing: 1px;
+}
+
+.dmc-struktur-liste {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.dmc-struktur-item {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 8px;
+    padding: 6px 10px;
+    background: #f5f6f8;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+.dmc-struktur-name {
+    font-weight: 500;
+}
+
+.dmc-struktur-laenge {
+    color: var(--as-text-muted);
+    font-family: var(--font-mono);
+}
+
+.dmc-struktur-laser3 {
+    font-family: var(--font-mono);
+    color: var(--as-accent);
+    font-size: 12px;
+}
+
+.dmc-schritte {
+    margin: 0;
+    padding-left: 20px;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.dmc-schritte li {
+    margin-bottom: 8px;
+}
+
+.dmc-schritt-detail {
+    color: var(--as-text-muted);
+    font-size: 12px;
+}
+
+/* ----- Canvas-Container ----- */
+.rechner-canvas-container {
+    background: var(--as-surface);
+    border: 1px solid var(--as-border);
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.rechner-canvas-container canvas {
+    max-width: 100%;
+    height: auto;
+    background: #fff;
+}
+
+/* ----- Statistik-Anzeige unter Eingabe ----- */
+.rechner-statistik {
+    margin-top: 16px;
+    padding: 12px 14px;
+    background: var(--as-surface-hover);
+    border-radius: 6px;
+    font-size: 13px;
+    color: var(--as-text);
+    line-height: 1.7;
+}
+
+.rechner-statistik strong {
+    color: var(--as-primary);
+}
+
+/* ----- Freitext-Eingabe ----- */
+.dmc-freitext .form-input {
+    font-family: var(--font-mono);
+    font-size: 14px;
+}

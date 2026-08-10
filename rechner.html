@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://dpxcrhywvblsbilyeiaw.supabase.co;">
+    <title>ALPA - Rechner und Planer</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="rechner">
+
+    <!-- =================================================================
+         HEADER (gleicher Aufbau wie produkte.html)
+         ================================================================= -->
+    <header class="app-header">
+        <div class="app-header-inner">
+            <a href="produkte.html" class="app-header-brand">
+                <img src="assets/asetronics-logo.png" alt="Asetronics AG" class="app-header-logo">
+                <div class="app-header-title">ALPA <small>Laser-Programm-Archiv</small></div>
+            </a>
+            <div class="app-header-user">
+                <span>Angemeldet: <strong class="user-label" id="user-email">-</strong></span>
+                <span id="admin-badge-header" class="admin-badge" style="display:none;">ADMIN</span>
+                <a href="anfragen.html" class="btn btn-secondary btn-sm" id="anfragen-link" style="display:none;">
+                    Anfragen <span id="anfragen-count-badge" class="anfragen-count-badge" style="display:none;">0</span>
+                </a>
+                <a href="produkte.html" class="btn btn-secondary btn-sm">Produkte</a>
+                <button class="btn btn-secondary btn-sm" onclick="logout()">Abmelden</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- =================================================================
+         MAIN: Rechner / Planer / Übersetzer
+         ================================================================= -->
+    <main class="app-main">
+        <div class="container">
+
+            <!-- Breadcrumb -->
+            <div class="breadcrumb">
+                <a href="produkte.html">Produkte</a>
+                <span class="breadcrumb-sep">&rsaquo;</span>
+                <span>Rechner &amp; Planer</span>
+            </div>
+
+            <h1 style="margin: 8px 0 8px 0;">Rechner &amp; Planer</h1>
+            <p style="color: var(--as-text-muted); margin: 0 0 24px 0;">
+                Werkzeuge fuer die Laser-3-Programmierung. DMC-Strukturen
+                uebersetzen, Leiterplatten und Nutzen planen.
+            </p>
+
+            <!-- =================================================================
+                 TAB-NAVIGATION
+                 ================================================================= -->
+            <div class="rechner-tabs">
+                <button class="rechner-tab active" data-tab="dmc">
+                    DMC-Übersetzer
+                </button>
+                <button class="rechner-tab" data-tab="lp">
+                    LP-Planer
+                </button>
+                <button class="rechner-tab" data-tab="nutzen">
+                    Nutzen-Planer
+                </button>
+            </div>
+
+            <!-- =================================================================
+                 TAB 1: DMC-Übersetzer (Mohamads Hauptwunsch)
+                 ================================================================= -->
+            <section id="tab-dmc" class="rechner-section active">
+
+                <div class="rechner-grid">
+                    <!-- ----- Linke Spalte: Eingabe ----- -->
+                    <div class="rechner-eingabe">
+
+                        <h2 class="rechner-section-title">1. DMC-Struktur eingeben</h2>
+                        <p class="rechner-hint">
+                            Wähle die Bausteine aus, die im DMC enthalten sein sollen,
+                            oder tippe die Struktur direkt ein.
+                        </p>
+
+                        <!-- Eingabe-Modus Umschalter -->
+                        <div class="rechner-modus">
+                            <label>
+                                <input type="radio" name="dmc-modus" value="baukasten" checked onchange="dmcModusWechseln()">
+                                Baukasten (Häkchen setzen)
+                            </label>
+                            <label style="margin-left: 16px;">
+                                <input type="radio" name="dmc-modus" value="freitext" onchange="dmcModusWechseln()">
+                                Freitext (selbst tippen)
+                            </label>
+                        </div>
+
+                        <!-- Baukasten-Eingabe -->
+                        <div id="dmc-baukasten" class="dmc-baukasten">
+                            <table class="dmc-tabelle">
+                                <thead>
+                                    <tr>
+                                        <th>Dabei?</th>
+                                        <th>Baustein</th>
+                                        <th>Zeichen</th>
+                                        <th>Beispiel</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><input type="checkbox" id="b-part" checked onchange="dmcBerechnen()"></td>
+                                        <td>Kunden-Artikelnr (part-nr)</td>
+                                        <td><input type="number" id="b-part-len" value="8" min="1" max="20" onchange="dmcBerechnen()"></td>
+                                        <td><input type="text" id="b-part-bsp" value="A45A0910" onchange="dmcBerechnen()"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" id="b-serial" checked onchange="dmcBerechnen()"></td>
+                                        <td>Seriennummer (serial)</td>
+                                        <td><input type="number" id="b-serial-len" value="8" min="1" max="20" onchange="dmcBerechnen()"></td>
+                                        <td><input type="text" id="b-serial-bsp" value="00123456" onchange="dmcBerechnen()"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" id="b-rev" checked onchange="dmcBerechnen()"></td>
+                                        <td>Revision (customerPartIndex)</td>
+                                        <td><input type="number" id="b-rev-len" value="2" min="1" max="10" onchange="dmcBerechnen()"></td>
+                                        <td><input type="text" id="b-rev-bsp" value="01" onchange="dmcBerechnen()"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" id="b-bin" checked onchange="dmcBerechnen()"></td>
+                                        <td>Binning (Sortierklasse)</td>
+                                        <td><input type="number" id="b-bin-len" value="1" min="1" max="5" onchange="dmcBerechnen()"></td>
+                                        <td><input type="text" id="b-bin-bsp" value="1" onchange="dmcBerechnen()"></td>
+                                    </tr>
+                                    <tr>
+                                        <td><input type="checkbox" id="b-date" onchange="dmcBerechnen()"></td>
+                                        <td>Datum (YYWW = Jahr+Woche)</td>
+                                        <td><input type="number" id="b-date-len" value="4" min="4" max="4" disabled></td>
+                                        <td><input type="text" id="b-date-bsp" value="2631" onchange="dmcBerechnen()"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <!-- Freitext-Eingabe -->
+                        <div id="dmc-freitext" class="dmc-freitext" style="display:none;">
+                            <label class="form-label" for="dmc-freitext-input">
+                                DMC-Struktur (mit &lt; und &gt; schreiben):
+                            </label>
+                            <input
+                                type="text"
+                                id="dmc-freitext-input"
+                                class="form-input mono"
+                                placeholder="<part-nr(8)><serial(8)><rev(2)><binning(1)>"
+                                value="<part-nr(8)><serial(8)><rev(2)><binning(1)>"
+                                oninput="dmcBerechnen()">
+                            <p class="rechner-hint" style="margin-top: 6px;">
+                                Bekannte Baustein-Namen: part-nr, serial, rev, binning, datum.
+                                Zahl in Klammern = Zeichenanzahl.
+                            </p>
+                        </div>
+
+                        <button class="btn btn-primary" style="margin-top: 16px;" onclick="dmcBerechnen()">
+                            Neu berechnen
+                        </button>
+
+                    </div>
+
+                    <!-- ----- Rechte Spalte: Ergebnis ----- -->
+                    <div class="rechner-ergebnis">
+
+                        <h2 class="rechner-section-title">2. Laser-3-Empfehlung</h2>
+
+                        <div id="dmc-ergebnis" class="dmc-ergebnis">
+                            <!-- Wird von JS gefuellt -->
+                            <div class="empty-state">Bitte links Bausteine wählen oder Struktur eintippen.</div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- =================================================================
+                 TAB 2: LP-Planer (1 Leiterplatte mit DMCs)
+                 ================================================================= -->
+            <section id="tab-lp" class="rechner-section">
+
+                <div class="rechner-grid">
+                    <!-- Linke Spalte: Eingabe -->
+                    <div class="rechner-eingabe">
+                        <h2 class="rechner-section-title">LP-Masse und Anordnung</h2>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="lp-breite">LP-Breite (mm)</label>
+                                <input type="number" id="lp-breite" class="form-input" value="100" min="1" oninput="zeichneLpPlan()">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="lp-laenge">LP-Länge (mm)</label>
+                                <input type="number" id="lp-laenge" class="form-input" value="160" min="1" oninput="zeichneLpPlan()">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="lp-start-x">Start X (mm)</label>
+                                <input type="number" id="lp-start-x" class="form-input" value="5" step="0.1" oninput="zeichneLpPlan()">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="lp-start-y">Start Y (mm)</label>
+                                <input type="number" id="lp-start-y" class="form-input" value="5" step="0.1" oninput="zeichneLpPlan()">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="lp-raster-x">Raster X (mm)</label>
+                                <input type="number" id="lp-raster-x" class="form-input" value="30" step="0.1" oninput="zeichneLpPlan()">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="lp-raster-y">Raster Y (mm)</label>
+                                <input type="number" id="lp-raster-y" class="form-input" value="40" step="0.1" oninput="zeichneLpPlan()">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="lp-spalten">Anzahl Spalten (X)</label>
+                                <input type="number" id="lp-spalten" class="form-input" value="3" min="1" oninput="zeichneLpPlan()">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="lp-reihen">Anzahl Reihen (Y)</label>
+                                <input type="number" id="lp-reihen" class="form-input" value="3" min="1" oninput="zeichneLpPlan()">
+                            </div>
+                        </div>
+
+                        <p class="rechner-hint">
+                            Reihenfolge X-then-Y: zuerst alle Spalten nach rechts, dann eine Reihe hoch.
+                            Wie Laser-3 Counter-Logik.
+                        </p>
+
+                        <div id="lp-statistik" class="rechner-statistik"></div>
+                    </div>
+
+                    <!-- Rechte Spalte: Canvas -->
+                    <div class="rechner-canvas-container">
+                        <canvas id="lp-canvas" width="600" height="600"></canvas>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- =================================================================
+                 TAB 3: Nutzen-Planer (Panel mit mehreren LPs)
+                 ================================================================= -->
+            <section id="tab-nutzen" class="rechner-section">
+
+                <div class="rechner-grid">
+                    <!-- Linke Spalte: Eingabe -->
+                    <div class="rechner-eingabe">
+                        <h2 class="rechner-section-title">Nutzen-Masse und LP-Anordnung</h2>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="n-breite">Nutzen-Breite (mm)</label>
+                                <input type="number" id="n-breite" class="form-input" value="200" min="1" oninput="zeichneNutzenPlan()">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="n-laenge">Nutzen-Länge (mm)</label>
+                                <input type="number" id="n-laenge" class="form-input" value="300" min="1" oninput="zeichneNutzenPlan()">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="n-lp-breite">Einzel-LP Breite (mm)</label>
+                                <input type="number" id="n-lp-breite" class="form-input" value="95" min="1" oninput="zeichneNutzenPlan()">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="n-lp-laenge">Einzel-LP Länge (mm)</label>
+                                <input type="number" id="n-lp-laenge" class="form-input" value="145" min="1" oninput="zeichneNutzenPlan()">
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label" for="n-rand">Rand/Steg (mm)</label>
+                                <input type="number" id="n-rand" class="form-input" value="5" step="0.1" oninput="zeichneNutzenPlan()">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label" for="n-orient">Orientierung</label>
+                                <select id="n-orient" class="form-input" onchange="zeichneNutzenPlan()">
+                                    <option value="gleich">Alle LPs gleich orientiert</option>
+                                    <option value="abwechselnd">Abwechselnd gedreht (Nutzen-Optimierung)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <p class="rechner-hint">
+                            Das Tool berechnet automatisch wie viele LPs in den Nutzen passen.
+                        </p>
+
+                        <div id="nutzen-statistik" class="rechner-statistik"></div>
+                    </div>
+
+                    <!-- Rechte Spalte: Canvas -->
+                    <div class="rechner-canvas-container">
+                        <canvas id="nutzen-canvas" width="600" height="600"></canvas>
+                    </div>
+                </div>
+
+            </section>
+
+        </div>
+    </main>
+
+    <!-- =================================================================
+         JAVASCRIPT
+         =================================================================
+         Wichtig: app.js (fuer checkAuth, displayUserInfo, logout, ladeAdminHeader)
+         und rechner.js (fuer die Rechner-Logik).
+         -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/rechner.js"></script>
+
+</body>
+</html>
