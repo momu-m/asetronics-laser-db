@@ -17,6 +17,7 @@
     --as-primary:       #003366;   /* Asetronics Dunkelblau */
     --as-primary-hover: #00264D;
     --as-accent:        #0078D4;
+    --as-blue:          #0078D4;   /* Alias fuer --as-accent (in detail.html verwendet) */
 
     /* Flaechen */
     --as-bg:            #F5F6F8;
@@ -154,6 +155,13 @@ code, .mono { font-family: var(--font-mono); }
     color: var(--as-text);
     letter-spacing: -0.02em;
     margin-bottom: 4px;
+}
+
+.page-subtitle {
+    font-size: 14px;
+    color: var(--as-text-muted);
+    margin: 0 0 24px 0;
+    line-height: 1.5;
 }
 
 .page-subtitle {
@@ -313,6 +321,7 @@ code, .mono { font-family: var(--font-mono); }
     align-items: center;
     gap: 8px;
     padding: 10px 20px;
+    min-height: 40px;            /* Tap-Target mindestgroesse (Apple HIG: 44) */
     border: 1px solid transparent;
     border-radius: 4px;
     font-family: var(--font-sans);
@@ -360,7 +369,7 @@ code, .mono { font-family: var(--font-mono); }
 }
 
 .btn-block { width: 100%; justify-content: center; }
-.btn-sm { padding: 6px 12px; font-size: 13px; }
+.btn-sm { padding: 8px 14px; font-size: 13px; min-height: 36px; }
 
 
 /* -------------------------------------------------------------------
@@ -1246,4 +1255,67 @@ td.mono { font-family: var(--font-mono); font-size: 12px; }
 .dmc-freitext .form-input {
     font-family: var(--font-mono);
     font-size: 14px;
+}
+
+
+/* =====================================================================
+   AUDIT-FIXES 10.08.2026: Mobile-Tap-Targets + Kleine-Handys-Breakpoint
+   ===================================================================== */
+
+/* Auf kleinen Bildschirmen alle Buttons auf mindestens 44px Höhe
+   (Apple HIG / WCAG-Empfehlung fuer Tap-Targets) */
+@media (max-width: 768px) {
+    .btn,
+    .btn-sm {
+        min-height: 44px;
+    }
+}
+
+/* Breakpoint fuer kleine Handys (320-480px) */
+@media (max-width: 480px) {
+    .app-header-inner {
+        padding: 0 12px;
+        height: 52px;
+    }
+    .app-header-logo {
+        height: 26px;
+    }
+    .app-header-user {
+        gap: 6px;
+        font-size: 11px;
+    }
+    .app-header-user .btn-sm {
+        padding: 6px 10px;
+        font-size: 11px;
+        min-height: 36px;
+    }
+    /* Bei sehr schmalem Bildschirm User-Label verbergen, Buttons bleiben */
+    .app-header-user .user-label {
+        display: none;
+    }
+    .app-container {
+        padding: 12px;
+    }
+    .page-title {
+        font-size: 20px;
+    }
+    .card {
+        padding: 14px;
+    }
+    .login-form-side {
+        padding: 16px;
+    }
+    .login-brand {
+        padding: 24px;
+    }
+    .login-brand h1 {
+        font-size: 20px;
+    }
+    .dmc-tabelle {
+        font-size: 12px;
+    }
+    .dmc-tabelle th,
+    .dmc-tabelle td {
+        padding: 6px 4px;
+    }
 }
