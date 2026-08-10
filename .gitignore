@@ -1,0 +1,27 @@
+# ALPA - Gitignore
+# WICHTIG: Diese Dateien duerfen NIEMALS in GitHub!
+
+# Zugangsdaten und Passwoerter
+ZUGANGSDATEN.md
+*.password
+*.secret
+.env
+.env.local
+
+# Service Role Key (sehr gefaehrlich!)
+*service_role*
+
+# Supabase Access Token
+*sbp_*
+
+# Backup-Dateien
+*.bak
+*.tmp
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+
+# Logs
+*.log
