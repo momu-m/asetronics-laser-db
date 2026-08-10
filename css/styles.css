@@ -1,0 +1,716 @@
+/* =====================================================================
+   ALPA - Asetronics Laser-Programm-Archiv
+   Eigenes Theme auf Basis von Pico.css (classless)
+   --------------------------------------------------------------------
+   Design-Philosophie:
+   - Industrie-Look, keine KI-Aesthetik
+   - Kleine Radii (4-6px), keine Gradients, dezente Schatten
+   - Datendichte statt Whitespace-Orgie
+   - Asetronics-Dunkelblau als Primaerfarbe
+   ===================================================================== */
+
+/* -------------------------------------------------------------------
+   1. CSS-Variablen (Asetronics Brand)
+   ------------------------------------------------------------------- */
+:root {
+    /* Primaerfarben */
+    --as-primary:       #003366;   /* Asetronics Dunkelblau */
+    --as-primary-hover: #00264D;
+    --as-accent:        #0078D4;
+
+    /* Flaechen */
+    --as-bg:            #F5F6F8;
+    --as-surface:       #FFFFFF;
+    --as-surface-hover: #F0F2F5;
+
+    /* Text */
+    --as-text:          #1A1F2E;
+    --as-text-muted:    #5A6478;
+
+    /* Trennlinien */
+    --as-border:        #E1E4EA;
+
+    /* Status-Farben (Industrie-Tones, nicht grell) */
+    --st-konvertiert-fg:    #4A5568;
+    --st-konvertiert-bg:    rgba(74, 85, 104, 0.12);
+    --st-testgelasert-fg:   #B8860B;
+    --st-testgelasert-bg:   rgba(184, 134, 11, 0.14);
+    --st-freigegeben-fg:    #1B7340;
+    --st-freigegeben-bg:    rgba(27, 115, 64, 0.14);
+    --st-gesperrt-fg:       #B91C1C;
+    --st-gesperrt-bg:       rgba(185, 28, 28, 0.14);
+
+    /* Schrift */
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                 Roboto, Oxygen, Ubuntu, sans-serif;
+    --font-mono: 'IBM Plex Mono', 'SF Mono', Monaco, Consolas, monospace;
+
+    /* Schatten */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+
+/* -------------------------------------------------------------------
+   2. Reset & Basis
+   ------------------------------------------------------------------- */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 16px; }
+
+body {
+    font-family: var(--font-sans);
+    background: var(--as-bg);
+    color: var(--as-text);
+    line-height: 1.5;
+    font-size: 14px;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+}
+
+a { color: var(--as-accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code, .mono { font-family: var(--font-mono); }
+
+
+/* -------------------------------------------------------------------
+   3. Header (fuer alle Seiten ausser Login)
+   ------------------------------------------------------------------- */
+.app-header {
+    background: var(--as-surface);
+    border-bottom: 1px solid var(--as-border);
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--shadow-sm);
+}
+
+.app-header-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 64px;
+}
+
+.app-header-brand {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    text-decoration: none;
+}
+
+.app-header-logo {
+    height: 32px;
+    width: auto;
+}
+
+.app-header-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--as-text);
+    letter-spacing: -0.01em;
+}
+
+.app-header-title small {
+    display: block;
+    font-size: 11px;
+    font-weight: 400;
+    color: var(--as-text-muted);
+    margin-top: 1px;
+}
+
+.app-header-user {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 13px;
+    color: var(--as-text-muted);
+}
+
+.app-header-user .user-label {
+    color: var(--as-text);
+    font-weight: 500;
+}
+
+
+/* -------------------------------------------------------------------
+   4. Container & Layout
+   ------------------------------------------------------------------- */
+.app-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px;
+}
+
+.page-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--as-text);
+    letter-spacing: -0.02em;
+    margin-bottom: 4px;
+}
+
+.page-subtitle {
+    font-size: 13px;
+    color: var(--as-text-muted);
+    margin-bottom: 24px;
+}
+
+
+/* -------------------------------------------------------------------
+   5. Login-Seite (Split-Screen)
+   ------------------------------------------------------------------- */
+.login-page {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    min-height: 100vh;
+}
+
+/* Linke Haelfte: Brand-Panel */
+.login-brand {
+    background: var(--as-primary);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 64px;
+    position: relative;
+    overflow: hidden;
+}
+
+.login-brand::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(255,255,255,0.04) 0%, transparent 70%);
+    pointer-events: none;
+}
+
+.login-brand-logo {
+    height: 56px;
+    width: auto;
+    margin-bottom: 48px;
+    filter: brightness(0) invert(1);
+}
+
+.login-brand h1 {
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 16px;
+    letter-spacing: -0.02em;
+}
+
+.login-brand p {
+    font-size: 15px;
+    opacity: 0.85;
+    line-height: 1.6;
+    max-width: 400px;
+    margin-bottom: 48px;
+}
+
+.login-brand-meta {
+    position: absolute;
+    bottom: 32px;
+    left: 64px;
+    font-size: 11px;
+    opacity: 0.6;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* Rechte Haelfte: Formular */
+.login-form-side {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px;
+    background: var(--as-bg);
+}
+
+.login-form {
+    width: 100%;
+    max-width: 360px;
+}
+
+.login-form h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--as-text);
+    margin-bottom: 8px;
+}
+
+.login-form .login-sub {
+    font-size: 13px;
+    color: var(--as-text-muted);
+    margin-bottom: 32px;
+}
+
+@media (max-width: 768px) {
+    .login-page { grid-template-columns: 1fr; }
+    .login-brand {
+        padding: 32px;
+        min-height: 200px;
+    }
+    .login-brand-logo { height: 36px; margin-bottom: 16px; }
+    .login-brand h1 { font-size: 22px; }
+    .login-brand p { display: none; }
+    .login-brand-meta { display: none; }
+    .login-form-side { padding: 24px; }
+}
+
+
+/* -------------------------------------------------------------------
+   6. Formulare
+   ------------------------------------------------------------------- */
+.form-group { margin-bottom: 16px; }
+
+.form-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--as-text-muted);
+    margin-bottom: 6px;
+}
+
+.form-input,
+.form-select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--as-border);
+    border-radius: 4px;
+    background: var(--as-surface);
+    color: var(--as-text);
+    font-size: 14px;
+    font-family: var(--font-sans);
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.form-input:focus,
+.form-select:focus {
+    outline: none;
+    border-color: var(--as-accent);
+    box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.15);
+}
+
+
+/* -------------------------------------------------------------------
+   7. Buttons
+   ------------------------------------------------------------------- */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    font-family: var(--font-sans);
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.15s, border-color 0.15s;
+    background: transparent;
+    color: var(--as-text);
+}
+
+.btn-primary {
+    background: var(--as-primary);
+    color: white;
+    border-color: var(--as-primary);
+}
+.btn-primary:hover {
+    background: var(--as-primary-hover);
+    border-color: var(--as-primary-hover);
+    text-decoration: none;
+}
+
+.btn-secondary {
+    background: var(--as-surface);
+    color: var(--as-text);
+    border-color: var(--as-border);
+}
+.btn-secondary:hover {
+    background: var(--as-surface-hover);
+    text-decoration: none;
+}
+
+.btn-download {
+    background: var(--as-primary);
+    color: white;
+    padding: 12px 24px;
+    font-weight: 600;
+    border-color: var(--as-primary);
+}
+.btn-download:hover {
+    background: var(--as-primary-hover);
+    border-color: var(--as-primary-hover);
+    text-decoration: none;
+}
+
+.btn-block { width: 100%; justify-content: center; }
+.btn-sm { padding: 6px 12px; font-size: 13px; }
+
+
+/* -------------------------------------------------------------------
+   8. Status-Badges (Pill-Form, gedämpft)
+   ------------------------------------------------------------------- */
+.badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    white-space: nowrap;
+}
+
+.badge-konvertiert  { background: var(--st-konvertiert-bg);  color: var(--st-konvertiert-fg); }
+.badge-testgelasert { background: var(--st-testgelasert-bg); color: var(--st-testgelasert-fg); }
+.badge-freigegeben  { background: var(--st-freigegeben-bg);  color: var(--st-freigegeben-fg); }
+.badge-gesperrt     { background: var(--st-gesperrt-bg);     color: var(--st-gesperrt-fg); }
+
+
+/* -------------------------------------------------------------------
+   9. Toolbar (Suche & Filter)
+   ------------------------------------------------------------------- */
+.toolbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.toolbar-search {
+    flex: 1;
+    min-width: 240px;
+    position: relative;
+}
+
+.toolbar-search input {
+    width: 100%;
+    padding: 9px 12px 9px 36px;
+    border: 1px solid var(--as-border);
+    border-radius: 4px;
+    background: var(--as-surface);
+    font-size: 14px;
+}
+
+.toolbar-search input:focus {
+    outline: none;
+    border-color: var(--as-accent);
+    box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.15);
+}
+
+.toolbar-search::before {
+    content: '';
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 14px;
+    height: 14px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235A6478' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E");
+    background-size: contain;
+    background-repeat: no-repeat;
+}
+
+.toolbar-select {
+    padding: 9px 12px;
+    border: 1px solid var(--as-border);
+    border-radius: 4px;
+    background: var(--as-surface);
+    font-size: 14px;
+    min-width: 160px;
+}
+
+
+/* -------------------------------------------------------------------
+   10. Tabelle
+   ------------------------------------------------------------------- */
+.table-card {
+    background: var(--as-surface);
+    border: 1px solid var(--as-border);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.table-wrap {
+    overflow-x: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+thead th {
+    background: var(--as-bg);
+    color: var(--as-text-muted);
+    font-weight: 600;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 10px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--as-border);
+    white-space: nowrap;
+}
+
+tbody td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--as-border);
+    color: var(--as-text);
+    vertical-align: middle;
+}
+
+tbody tr:last-child td { border-bottom: none; }
+
+tbody tr.clickable { cursor: pointer; }
+tbody tr.clickable:hover { background: var(--as-surface-hover); }
+
+td.numeric,
+th.numeric {
+    text-align: right;
+    font-family: var(--font-mono);
+    font-size: 12px;
+}
+
+td.mono { font-family: var(--font-mono); font-size: 12px; }
+
+.empty-state {
+    padding: 48px 24px;
+    text-align: center;
+    color: var(--as-text-muted);
+    font-size: 14px;
+}
+
+.loading-state {
+    padding: 48px 24px;
+    text-align: center;
+    color: var(--as-text-muted);
+}
+
+.loading-state::after {
+    content: '';
+    display: block;
+    width: 28px;
+    height: 28px;
+    margin: 12px auto 0;
+    border: 2.5px solid var(--as-border);
+    border-top-color: var(--as-primary);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+
+/* -------------------------------------------------------------------
+   11. Cards & Detailansicht
+   ------------------------------------------------------------------- */
+.card {
+    background: var(--as-surface);
+    border: 1px solid var(--as-border);
+    border-radius: 6px;
+    padding: 20px;
+    margin-bottom: 16px;
+}
+
+.card-title {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--as-text-muted);
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--as-border);
+}
+
+.detail-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.detail-header h1 {
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--as-text);
+}
+
+.detail-header .detail-meta {
+    font-size: 13px;
+    color: var(--as-text-muted);
+    margin-top: 4px;
+}
+
+.detail-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+}
+
+.detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.detail-item .label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--as-text-muted);
+}
+
+.detail-item .value {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--as-text);
+}
+
+.detail-item .value-mono {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    word-break: break-all;
+}
+
+.program-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--as-border);
+    gap: 16px;
+}
+.program-row:last-child { border-bottom: none; }
+
+.program-info h4 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--as-text);
+    margin-bottom: 2px;
+}
+.program-info .program-meta {
+    font-size: 12px;
+    color: var(--as-text-muted);
+}
+
+
+/* -------------------------------------------------------------------
+   12. Meldungen (Alerts)
+   ------------------------------------------------------------------- */
+.alert {
+    padding: 12px 16px;
+    border-radius: 4px;
+    font-size: 13px;
+    margin-bottom: 16px;
+    border: 1px solid;
+}
+
+.alert-error {
+    background: var(--st-gesperrt-bg);
+    color: var(--st-gesperrt-fg);
+    border-color: rgba(185, 28, 28, 0.25);
+}
+
+.alert-success {
+    background: var(--st-freigegeben-bg);
+    color: var(--st-freigegeben-fg);
+    border-color: rgba(27, 115, 64, 0.25);
+}
+
+.alert-info {
+    background: rgba(0, 120, 212, 0.08);
+    color: #005A9E;
+    border-color: rgba(0, 120, 212, 0.25);
+}
+
+
+/* -------------------------------------------------------------------
+   13. Breadcrumb
+   ------------------------------------------------------------------- */
+.breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--as-text-muted);
+    margin-bottom: 16px;
+}
+.breadcrumb a { color: var(--as-text-muted); }
+.breadcrumb a:hover { color: var(--as-accent); }
+.breadcrumb-separator { color: var(--as-border); }
+
+
+/* -------------------------------------------------------------------
+   14. Footer
+   ------------------------------------------------------------------- */
+.app-footer {
+    text-align: center;
+    padding: 24px;
+    font-size: 11px;
+    color: var(--as-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+
+/* -------------------------------------------------------------------
+   15. Admin-Bereich
+   ------------------------------------------------------------------- */
+.admin-section {
+    background: rgba(0, 120, 212, 0.04);
+    border-color: rgba(0, 120, 212, 0.2);
+}
+
+.admin-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--as-accent);
+    background: rgba(0, 120, 212, 0.1);
+    padding: 2px 8px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-left: 8px;
+    vertical-align: middle;
+}
+
+
+/* -------------------------------------------------------------------
+   16. Responsive
+   ------------------------------------------------------------------- */
+@media (max-width: 768px) {
+    .app-header-inner {
+        padding: 0 16px;
+        height: 56px;
+    }
+    .app-container { padding: 16px; }
+    .app-header-title { display: none; }
+    .detail-header h1 { font-size: 22px; }
+    .toolbar { flex-direction: column; align-items: stretch; }
+    .toolbar-select { width: 100%; }
+}

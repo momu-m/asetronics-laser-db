@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detail - ALPA</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body data-page="detail">
+
+    <!-- =================================================================
+         HEADER
+         ================================================================= -->
+    <header class="app-header">
+        <div class="app-header-inner">
+            <a href="produkte.html" class="app-header-brand">
+                <img src="assets/asetronics-logo.png" alt="Asetronics" class="app-header-logo">
+                <div class="app-header-title">
+                    ALPA
+                    <small>Laser-Programm-Archiv</small>
+                </div>
+            </a>
+            <div class="app-header-user">
+                <span>Angemeldet: <strong class="user-label" id="user-email">-</strong></span>
+                <a href="produkte.html" class="btn btn-secondary btn-sm">Zurueck</a>
+                <button class="btn btn-secondary btn-sm" onclick="logout()">Abmelden</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- =================================================================
+         HAUPTINHALT
+         ================================================================= -->
+    <main class="app-container">
+
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <a href="produkte.html">Programme</a>
+            <span class="breadcrumb-separator">/</span>
+            <span id="breadcrumb-name">Lade...</span>
+        </div>
+
+        <!-- Meldungen -->
+        <div id="detail-message" style="display: none;"></div>
+
+        <!-- Detail-Header: Titel + Status -->
+        <div class="detail-header">
+            <div>
+                <h1 id="detail-titel">Lade Produkt...</h1>
+                <div class="detail-meta" id="detail-meta">
+                    ASE-Materialnr. <span id="detail-meta-matnr">-</span>
+                </div>
+            </div>
+            <span id="detail-status" class="badge">-</span>
+        </div>
+
+        <!-- Produkt-Informationen -->
+        <div class="card">
+            <div class="card-title">Produkt-Informationen</div>
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <span class="label">Material</span>
+                    <span class="value" id="info-material">-</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Lackierung</span>
+                    <span class="value" id="info-lacquer">-</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Nutzen</span>
+                    <span class="value" id="info-nutzen">-</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">LP-Masse</span>
+                    <span class="value" id="info-masse">-</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Positionen</span>
+                    <span class="value" id="info-anzahl-positionen">-</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Variablen-Typ</span>
+                    <span class="value" id="info-variablen-typ">-</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">DMC-Struktur</span>
+                    <span class="value value-mono" id="info-dmc-struktur">-</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Erfasst am</span>
+                    <span class="value" id="info-erstellt-am">-</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Programme + Download -->
+        <div class="card">
+            <div class="card-title">Programm und Download</div>
+            <div id="programme-liste">
+                <div class="loading-state">Lade Programme...</div>
+            </div>
+        </div>
+
+        <!-- Positionstabelle -->
+        <div class="card">
+            <div class="card-title">Positionen (Kontrolltabelle)</div>
+            <div class="table-wrap" style="margin: 0 -20px -20px;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nr.</th>
+                            <th>Group</th>
+                            <th>Panel</th>
+                            <th>Counter</th>
+                            <th>Edge</th>
+                            <th class="numeric">X (mm)</th>
+                            <th class="numeric">Y (mm)</th>
+                            <th class="numeric">Angle</th>
+                        </tr>
+                    </thead>
+                    <tbody id="positionen-table-body">
+                        <tr><td colspan="8" class="loading-state">Lade Positionen...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Admin-Bereich (nur fuer Mohamad sichtbar) -->
+        <div class="card admin-section" id="admin-bereich" style="display: none;">
+            <div class="card-title">
+                Admin: Status aendern
+                <span class="admin-badge">Admin</span>
+            </div>
+            <p style="font-size: 12px; color: var(--as-text-muted); margin-bottom: 12px;">
+                Nur Mohamad darf den Status aendern. Jede Aenderung wird protokolliert.
+            </p>
+            <div class="toolbar" style="margin-bottom: 0;">
+                <select id="neuer-status" class="toolbar-select">
+                    <option value="konvertiert">Konvertiert</option>
+                    <option value="testgelasert">Testgelasert</option>
+                    <option value="freigegeben">Freigegeben</option>
+                    <option value="gesperrt">Gesperrt</option>
+                </select>
+                <input
+                    type="text"
+                    id="bemerkung-status"
+                    class="form-input"
+                    style="flex: 1;"
+                    placeholder="Bemerkung (z.B. Test OK am 28.08.)">
+                <button class="btn btn-primary" onclick="adminStatusAendern()">
+                    Status speichern
+                </button>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="app-footer">
+        ALPA v1.0 &middot; Asetronics AG Bern &middot; SMT-Produktion
+    </footer>
+
+    <!-- =================================================================
+         JAVASCRIPT
+         ================================================================= -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+    <script src="config.js"></script>
+    <script src="js/app.js"></script>
+
+    <!-- Admin-Bereich einblenden wenn Admin -->
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            setTimeout(async () => {
+                if (await isAdmin()) {
+                    document.getElementById('admin-bereich').style.display = 'block';
+                }
+            }, 1200);
+        });
+
+        async function adminStatusAendern() {
+            const produkt = window.aktuellesProdukt;
+            if (!produkt) { alert('Produkt nicht geladen.'); return; }
+            const status = document.getElementById('neuer-status').value;
+            const bemerkung = document.getElementById('bemerkung-status').value;
+            await aendereStatus(produkt.id, status, bemerkung);
+        }
+    </script>
+
+</body>
+</html>
