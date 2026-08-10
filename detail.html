@@ -132,6 +132,23 @@
             </div>
         </div>
 
+        <!-- Layout-Gruppe: zeigt andere Artikelnummern mit gleichem LP-Layout.
+             Beschluss 10.08.2026: Mo will sehen, welche Produkte dasselbe
+             physische Layout nutzen (z.B. BM054-11HA teilt BM054-xxC mit
+             BM054-12HA, -21HA, -22HA, -44HA). Wird nur angezeigt, wenn
+             das Produkt einer Gruppe mit mehreren Mitgliedern angehoert. -->
+        <div class="card" id="layout-gruppe-block" style="display: none;">
+            <div class="card-title">
+                Gleiche Layout-Gruppe
+            </div>
+            <p style="font-size: 13px; color: var(--as-text-muted); margin-bottom: 12px;">
+                Diese Artikelnummern nutzen dasselbe ProductLayout
+                (<strong id="layout-gruppe-name">-</strong>).
+                Auf Laser 3 reicht es, dieses Layout einmal einzurichten.
+            </p>
+            <div id="layout-gruppe-liste" class="layout-gruppe-liste"></div>
+        </div>
+
         <!-- Admin-Bereich (nur fuer Mohamad sichtbar) -->
         <div class="card admin-section" id="admin-bereich" style="display: none;">
             <div class="card-title">

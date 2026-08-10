@@ -387,6 +387,69 @@ async function loadDetail() {
 
     // Details anzeigen (leere Arrays bei Fehler)
     renderDetail(produkt, programme || [], positionen || []);
+
+    // Schwestprodukte (gleiche Layout-Gruppe) laden, wenn vorhanden.
+    // Beschluss 10.08.2026: Mo will sehen, welche anderen Artikelnummern
+    // dasselbe physische LP-Layout nutzen (z.B. BM054-11HA teilt BM054-xxC
+    // mit BM054-12HA, -21HA, -22HA, -44HA).
+    if (produkt.layout_gruppe) {
+        ladeSchwestprodukte(produkt.layout_gruppe, produkt.id);
+    } else {
+        // Kein Layout zugeordnet -> Bereich verstecken
+        const block = document.getElementById('layout-gruppe-block');
+        if (block) block.style.display = 'none';
+    }
+}
+
+/**
+ * Laedt alle Produkte, die dieselbe layout_gruppe haben wie das aktuelle.
+ * Wird in der Detailansicht angezeigt ("Dieses Layout wird auch genutzt von:").
+ *
+ * @param {string} layoutGruppe - Name der Layout-Gruppe (z.B. "BM054-xxC")
+ * @param {string} eigenesId   - ID des aktuell angezeigten Produkts (wird ausgeblendet)
+ */
+async function ladeSchwestprodukte(layoutGruppe, eigenesId) {
+    const client = initSupabase();
+    if (!client) return;
+
+    const { data, error } = await client
+        .from('produkte')
+        .select('id, bezeichnung, ase_materialnr')
+        .eq('layout_gruppe', layoutGruppe)
+        .neq('id', eigenesId)
+        .order('bezeichnung', { ascending: true });
+
+    const block = document.getElementById('layout-gruppe-block');
+    const liste = document.getElementById('layout-gruppe-liste');
+    const titel = document.getElementById('layout-gruppe-name');
+
+    if (error || !data) {
+        console.error('Fehler beim Laden der Schwestprodukte:', error);
+        if (block) block.style.display = 'none';
+        return;
+    }
+
+    // Wenn keine anderen Produkte dieselbe Gruppe haben, Bereich verstecken.
+    if (data.length === 0) {
+        if (block) block.style.display = 'none';
+        return;
+    }
+
+    // Gruppennamen anzeigen
+    if (titel) titel.textContent = layoutGruppe;
+
+    // Liste der Schwestprodukte als klickbare Links rendern.
+    // XSS-Schutz: escapeHtml auf alle Werte aus der DB.
+    if (liste) {
+        liste.innerHTML = data.map(p => `
+            <a href="detail.html?id=${encodeURIComponent(p.id)}"
+               class="layout-schwester-link">
+                ${escapeHtml(p.bezeichnung)}
+                <span class="layout-schwester-matnr">(${escapeHtml(p.ase_materialnr || '-')})</span>
+            </a>
+        `).join('');
+    }
+    if (block) block.style.display = 'block';
 }
 
 /**
