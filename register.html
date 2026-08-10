@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://dpxcrhywvblsbilyeiaw.supabase.co;">
-    <title>ALPA - Asetronics Laser-Programm-Archiv</title>
+    <title>ALPA - Zugriff beantragen</title>
 
     <!-- Inter Schriftart -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -14,18 +14,18 @@
 
     <link rel="stylesheet" href="css/styles.css">
 </head>
-<body data-page="login">
+<body data-page="register">
 
     <!-- =================================================================
-         LOGIN-SEITE (Split-Screen)
+         REGISTRIERUNGS-SEITE (gleicher Split-Screen wie Login)
          =================================================================
-         Links:  Brand-Panel mit Asetronics-Blau und Logo
-         Rechts: Login-Formular
+         Links:  Brand-Panel (gleich wie Login)
+         Rechts: Registrierungs-Formular mit drei Feldern
          ================================================================= -->
 
     <div class="login-page">
 
-        <!-- Linke Haelfte: Brand-Panel -->
+        <!-- Linke Haelfte: Brand-Panel (identisch zu index.html) -->
         <div class="login-brand">
             <img src="assets/asetronics-logo.png"
                  alt="Asetronics AG"
@@ -43,23 +43,40 @@
             </div>
         </div>
 
-        <!-- Rechte Haelfte: Login-Formular -->
+        <!-- Rechte Haelfte: Registrierungs-Formular -->
         <div class="login-form-side">
             <div class="login-form">
 
-                <h2>Anmeldung</h2>
+                <h2>Zugriff beantragen</h2>
                 <p class="login-sub">
-                    Bitte mit Firmen-E-Mail anmelden.
+                    Mohamad Murad prueft deine Anfrage und schaltet dich frei.
                 </p>
 
                 <!-- Meldungsbereich -->
                 <div id="message" style="display: none;"></div>
 
-                <!-- Login-Formular -->
-                <form onsubmit="login(event)">
+                <!-- Registrierungs-Formular -->
+                <!-- WICHTIG: Fieldset mit overflow:hidden damit der
+                     Reload-Spinner nach Erfolg verschwindet (Trick der
+                     Browser-Historie). -->
+                <form id="register-form" onsubmit="register(event)">
 
                     <div class="form-group">
-                        <label class="form-label" for="email">E-Mail</label>
+                        <label class="form-label" for="voller-name">Voller Name</label>
+                        <input
+                            type="text"
+                            id="voller-name"
+                            name="voller-name"
+                            class="form-input"
+                            placeholder="Vorname Nachname"
+                            required
+                            autocomplete="name"
+                            minlength="3"
+                            autofocus>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="email">Firmen-E-Mail</label>
                         <input
                             type="email"
                             id="email"
@@ -67,8 +84,7 @@
                             class="form-input"
                             placeholder="vorname.nachname@asetronics.ch"
                             required
-                            autocomplete="email"
-                            autofocus>
+                            autocomplete="email">
                     </div>
 
                     <div class="form-group">
@@ -78,28 +94,43 @@
                             id="password"
                             name="password"
                             class="form-input"
-                            placeholder="Passwort"
+                            placeholder="Mindestens 8 Zeichen"
                             required
-                            autocomplete="current-password">
+                            autocomplete="new-password"
+                            minlength="8">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="password2">Passwort wiederholen</label>
+                        <input
+                            type="password"
+                            id="password2"
+                            name="password2"
+                            class="form-input"
+                            placeholder="Passwort wiederholen"
+                            required
+                            autocomplete="new-password"
+                            minlength="8">
                     </div>
 
                     <button type="submit" class="btn btn-primary btn-block" style="margin-top: 8px;">
-                        Anmelden
+                        Zugriff beantragen
                     </button>
 
                 </form>
 
-                <!-- Link zur Registrierungs-Seite -->
+                <!-- Link zurueck zur Anmeldung -->
                 <p style="margin-top: 24px; font-size: 13px;">
-                    Noch kein Konto?
-                    <a href="register.html" style="color: var(--as-accent); font-weight: 500;">
-                        Zugriff beantragen
+                    Bereits ein Konto?
+                    <a href="index.html" style="color: var(--as-accent); font-weight: 500;">
+                        Zur Anmeldung
                     </a>
                 </p>
 
                 <p style="margin-top: 16px; font-size: 12px; color: var(--as-text-muted);">
-                    Zugriff nur fuer freigeschaltete Benutzer.
-                    Bei Problemen Mohamad Murad kontaktieren.
+                    Nach der Registrierung prueft Mohamad Murad deine Anfrage.
+                    Du bekommst keine automatische E-Mail - melde dich bei ihm,
+                    wenn es eilt.
                 </p>
 
             </div>
@@ -109,8 +140,6 @@
 
     <!-- =================================================================
          JAVASCRIPT
-         =================================================================
-         Reihenfolge: Supabase-Bibliothek (CDN), dann config, dann app.js
          ================================================================= -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="config.js"></script>

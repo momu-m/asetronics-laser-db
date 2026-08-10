@@ -794,3 +794,168 @@ td.mono { font-family: var(--font-mono); font-size: 12px; }
     border-radius: 50%;
     border: 1px solid rgba(0,0,0,0.1);
 }
+
+
+/* =====================================================================
+   NEU 10.08.2026: Registrierungs- und Anfragen-System
+   ===================================================================== */
+
+/* ----- Anfragen-Zaehler-Badge im Header (roter Punkt mit Zahl) ----- */
+.anfragen-count-badge {
+    display: inline-block;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    margin-left: 6px;
+    border-radius: 9px;
+    background: #e63946;
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    line-height: 18px;
+    text-align: center;
+    vertical-align: middle;
+}
+
+/* ----- Admin-Badge "ADMIN" im Header (neben der E-Mail) ----- */
+/* Es gibt bereits eine .admin-badge Klasse (Zeile ~688). Falls die
+   schon anders definiert ist, hier die Variante fuer den Header. */
+.app-header-user .admin-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    background: rgba(0, 120, 212, 0.12);
+    color: var(--as-accent);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-left: 4px;
+    margin-right: 4px;
+}
+
+/* ----- Anfragen-Seite: Karten-Layout fuer eine Anfrage ----- */
+.anfrage-karte {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+    background: var(--as-surface);
+    border: 1px solid var(--as-border);
+    border-radius: 8px;
+    flex-wrap: wrap;
+}
+
+.anfrage-karte-approved {
+    border-left: 4px solid #2a9d8f;
+}
+
+.anfrage-karte-rejected {
+    border-left: 4px solid #e63946;
+    opacity: 0.75;
+}
+
+.anfrage-info {
+    flex: 1;
+    min-width: 200px;
+}
+
+.anfrage-name {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--as-text);
+    margin-bottom: 2px;
+}
+
+.anfrage-email {
+    font-size: 13px;
+    color: var(--as-text);
+    margin-bottom: 4px;
+}
+
+.anfrage-meta {
+    font-size: 12px;
+    color: var(--as-text-muted);
+}
+
+.anfrage-aktionen {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+/* "Gefahr"-Button (rot, nur Umriss) fuer Ablehnen / Entziehen */
+.btn-danger-ghost {
+    color: #c92a2a;
+    border-color: #ffa8a8;
+    background: #fff;
+}
+
+.btn-danger-ghost:hover {
+    background: #fff5f5;
+    border-color: #e63946;
+}
+
+/* ----- Admin-Section Titel mit Badge ----- */
+.admin-section-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--as-text);
+    margin: 0 0 4px 0;
+}
+
+.admin-section-sub {
+    font-size: 13px;
+    color: var(--as-text-muted);
+    margin: 0 0 16px 0;
+}
+
+/* ----- Breadcrumb (fuer anfragen.html Navigation) ----- */
+.breadcrumb {
+    font-size: 13px;
+    color: var(--as-text-muted);
+    margin-bottom: 4px;
+}
+
+.breadcrumb a {
+    color: var(--as-accent);
+    text-decoration: none;
+}
+
+.breadcrumb a:hover {
+    text-decoration: underline;
+}
+
+.breadcrumb-sep {
+    margin: 0 6px;
+    color: var(--as-text-muted);
+}
+
+/* ----- Login-Link gestalten (Register/Login-Seiten) ----- */
+.login-form a {
+    text-decoration: none;
+}
+
+.login-form a:hover {
+    text-decoration: underline;
+}
+
+/* ----- Mobile: Anfrage-Karten untereinander ----- */
+@media (max-width: 640px) {
+    .anfrage-karte {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .anfrage-aktionen {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .anfrage-aktionen .btn {
+        width: 100%;
+    }
+}

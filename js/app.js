@@ -159,6 +159,13 @@ async function checkAuth() {
 /**
  * Login mit E-Mail und Passwort.
  * Wird vom Login-Formular aufgerufen.
+ *
+ * ABLAUF (mit Freigabe-Workflow seit 10.08.2026):
+ *   1. Supabase signInWithPassword prueft E-Mail/Passwort
+ *   2. Falls Login OK: profile.status aus DB laden
+ *   3. Bei status='approved': weiter zu produkte.html
+ *   4. Bei status='pending': Hinweis "Warte auf Freigabe" + Logout
+ *   5. Bei status='rejected': Hinweis "Abgelehnt" + Logout
  */
 async function login(event) {
     event.preventDefault();   // Verhindert Seiten-Neuladen
@@ -175,7 +182,7 @@ async function login(event) {
         return;
     }
 
-    // Anmelden
+    // 1. Anmelden
     const { data, error } = await client.auth.signInWithPassword({
         email: email,
         password: password
@@ -189,7 +196,56 @@ async function login(event) {
         return;
     }
 
-    // Erfolg -> zur Produktliste
+    // 2. profile.status laden, um zu pruefen ob freigegeben
+    const { data: profile, error: profileErr } = await client
+        .from('profile')
+        .select('status, voller_name, rolle')
+        .eq('id', data.user.id)
+        .single();
+
+    // Spezialfall: Login OK, aber kein profile vorhanden.
+    // Das passiert wenn der Trigger noch nicht lief oder der User
+    // aelter ist. Wir zeigen einen Hinweis und loggen aus.
+    if (profileErr || !profile) {
+        await client.auth.signOut();
+        showMessage(
+            'Dein Konto hat noch kein Profil. ' +
+            'Wende dich an Mohamad Murad.',
+            'error'
+        );
+        return;
+    }
+
+    // 3. Status auswerten
+    if (profile.status === 'approved') {
+        // Freigegeben -> weiter zur Produktliste
+        window.location.href = 'produkte.html';
+        return;
+    }
+
+    if (profile.status === 'pending') {
+        // Wartet auf Freigabe -> Hinweis + Logout
+        await client.auth.signOut();
+        showMessage(
+            'Dein Konto wartet noch auf Freigabe durch Mohamad Murad. ' +
+            'Bitte wende dich an ihn, falls es eilt.',
+            'info'
+        );
+        return;
+    }
+
+    if (profile.status === 'rejected') {
+        // Abgelehnt -> Hinweis + Logout
+        await client.auth.signOut();
+        showMessage(
+            'Dein Zugangsantrag wurde abgelehnt. ' +
+            'Bei Fragen wende dich an Mohamad Murad.',
+            'error'
+        );
+        return;
+    }
+
+    // Fallback (sollte nicht vorkommen): durchlassen
     window.location.href = 'produkte.html';
 }
 
@@ -1133,6 +1189,519 @@ async function aendereStatus(produktId, neuerStatus, bemerkung = '') {
 
 
 // =====================================================================
+// 6b. REGISTRIERUNG (Self-Service Signup)
+// =====================================================================
+// Beschluss 10.08.2026: Mohamad will, dass sich neue Personen selbst
+// registrieren koennen, er aber jede Anfrage freigeben muss.
+//
+// Ablauf:
+//   1. Person fuellt Formular (Name, E-Mail, Passwort)
+//   2. supabase.auth.signUp() legt den User in auth.users an
+//   3. Der Datenbank-Trigger legt automatisch eine profile-Zeile
+//      mit status='pending' an
+//   4. Mohamad sieht die Anfrage im Header-Badge und entscheidet
+
+
+/**
+ * Registriert einen neuen Benutzer.
+ * Wird vom Registrierungs-Formular aufgerufen.
+ *
+ * @param {Event} event - Das Formular-Event
+ */
+async function register(event) {
+    event.preventDefault();
+
+    // Felder auslesen
+    const vollerName = document.getElementById('voller-name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const password2 = document.getElementById('password2').value;
+
+    // Client-Validierung (bevor wir Supabase fragen)
+    if (vollerName.length < 3) {
+        showMessage('Bitte deinen vollen Namen angeben.', 'error');
+        return;
+    }
+    if (password.length < 8) {
+        showMessage('Passwort muss mindestens 8 Zeichen lang sein.', 'error');
+        return;
+    }
+    if (password !== password2) {
+        showMessage('Die Passwoerter stimmen nicht ueberein.', 'error');
+        return;
+    }
+
+    const client = initSupabase();
+    if (!client) {
+        showMessage('Supabase nicht konfiguriert.', 'error');
+        return;
+    }
+
+    // signUp legt den User in auth.users an.
+    // Der Trigger on_auth_user_created feuert automatisch und legt
+    // die profile-Zeile mit status='pending' an.
+    //
+    // Der dritte Parameter "options.data" wird in raw_user_meta_data
+    // gespeichert. Darueber uebergeben wir den vollen Namen an den Trigger.
+    const { data, error } = await client.auth.signUp({
+        email: email,
+        password: password,
+        options: {
+            data: {
+                voller_name: vollerName
+            }
+        }
+    });
+
+    if (error) {
+        // Haeufige Fehler:
+        // - "User already registered" -> E-Mail existiert schon
+        // - "Password should be at least 6 characters" (Supabase-Default)
+        showMessage(
+            'Registrierung fehlgeschlagen: ' + error.message,
+            'error'
+        );
+        return;
+    }
+
+    // Erfolg: Das Formular durch einen Hinweis ersetzen.
+    // So kann die Person nichts Falsches mehr klicken.
+    const form = document.getElementById('register-form');
+    if (form) {
+        form.innerHTML = `
+            <div class="alert alert-success" style="margin-top: 16px;">
+                <strong>Anfrage eingegangen.</strong><br><br>
+                Hallo ${escapeHtml(vollerName)},<br><br>
+                deine Anfrage wurde an Mohamad Murad weitergeleitet.
+                Sobald er dich freischaltet, kannst du dich mit deiner
+                E-Mail und deinem Passwort anmelden.<br><br>
+                Du bekommst keine automatische E-Mail. Melde dich bei
+                Mohamad, falls es eilt.
+            </div>
+            <p style="margin-top: 24px; font-size: 13px;">
+                <a href="index.html" style="color: var(--as-accent); font-weight: 500;">
+                    Zur Anmeldung
+                </a>
+            </p>
+        `;
+    }
+}
+
+
+// =====================================================================
+// 6c. ADMIN-HEADER (Badge mit Anzahl offener Anfragen)
+// =====================================================================
+
+
+/**
+ * Prueft, ob der aktuelle User Admin ist, und zeigt ggf. das
+ * Admin-Badge sowie den Anfragen-Link mit Anzahl im Header.
+ *
+ * Wird auf produkte.html, detail.html und anfragen.html aufgerufen.
+ *
+ * @param {Object} session - Die aktuelle Supabase-Session
+ */
+async function ladeAdminHeader(session) {
+    const admin = await isAdmin();
+    if (!admin) {
+        // Kein Admin -> Badge und Link verstecken (sind per Default hidden)
+        return;
+    }
+
+    // Admin-Badge "ADMIN" anzeigen
+    const badgeHeader = document.getElementById('admin-badge-header');
+    if (badgeHeader) badgeHeader.style.display = 'inline-block';
+
+    // Anfragen-Link anzeigen und Anzahl laden
+    const link = document.getElementById('anfragen-link');
+    if (!link) return;
+    link.style.display = 'inline-flex';
+
+    const client = initSupabase();
+    if (!client) return;
+
+    // Zaehle alle profile mit status='pending'.
+    // Das geht durch die RLS-Policy, weil Admins alle profile lesen duerfen.
+    const { count, error } = await client
+        .from('profile')
+        .select('id', { count: 'exact', head: true })
+        .eq('status', 'pending');
+
+    if (error) {
+        console.error('Fehler beim Laden der Anfragen-Anzahl:', error.message);
+        return;
+    }
+
+    const anzahl = count || 0;
+    const countBadge = document.getElementById('anfragen-count-badge');
+    if (countBadge) {
+        if (anzahl > 0) {
+            countBadge.textContent = anzahl;
+            countBadge.style.display = 'inline-block';
+        } else {
+            countBadge.style.display = 'none';
+        }
+    }
+}
+
+
+// =====================================================================
+// 6d. ANFRAGEN-SEITE (Admin-UI)
+// =====================================================================
+// Laedt alle User-Profile gruppiert nach Status (pending/approved/rejected)
+// und zeigt sie in drei Listen an. Admins koennen:
+//   - pending -> approved (mit Rolle bediener/admin)
+//   - pending -> rejected (mit optionalem Grund)
+//   - approved -> Rolle aendern (spaeter moeglich, aktuell Fokus auf Freigabe)
+
+
+/**
+ * Laedt alle Profile und rendert die drei Listen.
+ * Wird beim Laden von anfragen.html aufgerufen.
+ */
+async function loadAnfragen() {
+    const client = initSupabase();
+    if (!client) return;
+
+    // 1. Admin pruefen. Wenn kein Admin: Hinweis zeigen und abbrechen.
+    const admin = await isAdmin();
+    if (!admin) {
+        document.getElementById('no-admin-hint').style.display = 'block';
+        // Die drei sections verstecken
+        document.getElementById('section-pending').style.display = 'none';
+        document.getElementById('section-approved').style.display = 'none';
+        document.getElementById('section-rejected').style.display = 'none';
+        return;
+    }
+
+    // 2. Alle Profile laden, neueste zuerst.
+    // RLS erlaubt Admins den Zugriff auf alle Zeilen.
+    const { data: alleProfile, error } = await client
+        .from('profile')
+        .select('*')
+        .order('erstellt_am', { ascending: false });
+
+    if (error) {
+        showMessage(
+            'Fehler beim Laden der Anfragen: ' + error.message,
+            'error'
+        );
+        return;
+    }
+
+    // 3. Nach Status gruppieren
+    const pending   = alleProfile.filter(p => p.status === 'pending');
+    const approved  = alleProfile.filter(p => p.status === 'approved');
+    const rejected  = alleProfile.filter(p => p.status === 'rejected');
+
+    // 4. Zaehler aktualisieren
+    document.getElementById('pending-count').textContent = pending.length;
+    document.getElementById('approved-count').textContent = approved.length;
+    document.getElementById('rejected-count').textContent = rejected.length;
+
+    // 5. Listen rendern
+    renderPendingListe(pending);
+    renderApprovedListe(approved);
+    renderRejectedListe(rejected);
+}
+
+
+/**
+ * Rendert die Liste der offenen (pending) Anfragen.
+ * Pro Eintrag: Name, E-Mail, Datum, Buttons "Genehmigen als Bediener",
+ * "Genehmigen als Admin", "Ablehnen".
+ *
+ * @param {Array} profile - Array von profile-Objekten mit status='pending'
+ */
+function renderPendingListe(profile) {
+    const container = document.getElementById('pending-liste');
+
+    if (!profile || profile.length === 0) {
+        container.innerHTML =
+            '<div class="empty-state">Keine offenen Anfragen. Alles erledigt.</div>';
+        return;
+    }
+
+    container.innerHTML = profile.map(p => `
+        <div class="anfrage-karte" data-profile-id="${escapeHtml(p.id)}">
+            <div class="anfrage-info">
+                <div class="anfrage-name">${escapeHtml(p.voller_name || '-')}</div>
+                <div class="anfrage-email mono">${escapeHtml(p.email || '-')}</div>
+                <div class="anfrage-meta">
+                    Registriert: ${formatDate(p.erstellt_am)}
+                </div>
+            </div>
+            <div class="anfrage-aktionen">
+                <button class="btn btn-primary btn-sm"
+                        onclick="genehmigeUser('${escapeHtml(p.id)}', 'bediener')">
+                    Freigeben als Bediener
+                </button>
+                <button class="btn btn-secondary btn-sm"
+                        onclick="genehmigeUser('${escapeHtml(p.id)}', 'admin')">
+                    Freigeben als Admin
+                </button>
+                <button class="btn btn-secondary btn-sm btn-danger-ghost"
+                        onclick="lehneAb('${escapeHtml(p.id)}')">
+                    Ablehnen
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+
+/**
+ * Rendert die Liste der freigegebenen (approved) Benutzer.
+ *
+ * @param {Array} profile - Array von profile-Objekten mit status='approved'
+ */
+function renderApprovedListe(profile) {
+    const container = document.getElementById('approved-liste');
+
+    if (!profile || profile.length === 0) {
+        container.innerHTML =
+            '<div class="empty-state">Noch niemand freigegeben.</div>';
+        return;
+    }
+
+    container.innerHTML = profile.map(p => `
+        <div class="anfrage-karte anfrage-karte-approved">
+            <div class="anfrage-info">
+                <div class="anfrage-name">
+                    ${escapeHtml(p.voller_name || '-')}
+                    ${p.rolle === 'admin'
+                        ? '<span class="badge badge-freigegeben" style="margin-left:8px;">ADMIN</span>'
+                        : '<span class="badge badge-konvertiert" style="margin-left:8px;">BEDINER</span>'}
+                </div>
+                <div class="anfrage-email mono">${escapeHtml(p.email || '-')}</div>
+                <div class="anfrage-meta">
+                    Freigegeben von ${escapeHtml(p.freigeben_von || '-')} am
+                    ${formatDate(p.freigegeben_am)}
+                </div>
+            </div>
+            <div class="anfrage-aktionen">
+                ${p.rolle === 'admin'
+                    ? `<button class="btn btn-secondary btn-sm"
+                            onclick="aendereRolle('${escapeHtml(p.id)}', 'bediener')">
+                        Zu Bediener machen
+                       </button>`
+                    : `<button class="btn btn-secondary btn-sm"
+                            onclick="aendereRolle('${escapeHtml(p.id)}', 'admin')">
+                        Zu Admin machen
+                       </button>`}
+                <button class="btn btn-secondary btn-sm btn-danger-ghost"
+                        onclick="entzieheFreigabe('${escapeHtml(p.id)}')">
+                    Zugriff entziehen
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+
+/**
+ * Rendert die Liste der abgelehnten (rejected) Anfragen.
+ *
+ * @param {Array} profile - Array von profile-Objekten mit status='rejected'
+ */
+function renderRejectedListe(profile) {
+    const container = document.getElementById('rejected-liste');
+
+    if (!profile || profile.length === 0) {
+        container.innerHTML =
+            '<div class="empty-state">Keine abgelehnten Anfragen.</div>';
+        return;
+    }
+
+    container.innerHTML = profile.map(p => `
+        <div class="anfrage-karte anfrage-karte-rejected">
+            <div class="anfrage-info">
+                <div class="anfrage-name">${escapeHtml(p.voller_name || '-')}</div>
+                <div class="anfrage-email mono">${escapeHtml(p.email || '-')}</div>
+                <div class="anfrage-meta">
+                    Abgelehnt. ${p.abgelehnt_grund
+                        ? 'Grund: ' + escapeHtml(p.abgelehnt_grund)
+                        : 'Kein Grund angegeben.'}
+                </div>
+            </div>
+            <div class="anfrage-aktionen">
+                <button class="btn btn-secondary btn-sm"
+                        onclick="genehmigeUser('${escapeHtml(p.id)}', 'bediener')">
+                    Doch freigeben (Bediener)
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+
+/**
+ * Genehmigt eine Anfrage: setzt status auf 'approved' und traegt die Rolle ein.
+ *
+ * @param {string} profileId - UUID des Profile-Eintrags
+ * @param {string} rolle - 'bediener' oder 'admin'
+ */
+async function genehmigeUser(profileId, rolle) {
+    const client = initSupabase();
+    if (!client) return;
+
+    // Sicherheits-Check: Rolle validieren
+    if (rolle !== 'bediener' && rolle !== 'admin') {
+        showMessage('Ungueltige Rolle.', 'error');
+        return;
+    }
+
+    // Bestaetigung fuer Admin-Freigabe (zusaetzliche Huerde)
+    if (rolle === 'admin') {
+        const ok = confirm(
+            'Soll diese Person wirklich ADMIN-Rechte bekommen?\n' +
+            'Admins koennen Produkte aendern und andere User verwalten.'
+        );
+        if (!ok) return;
+    }
+
+    // Aktuelle Admin-E-Mail fuer Audit
+    const { data: { session } } = await client.auth.getSession();
+    const adminEmail = session?.user?.email || 'unbekannt';
+
+    // Profile aktualisieren
+    const { error } = await client
+        .from('profile')
+        .update({
+            status: 'approved',
+            rolle: rolle,
+            freigegeben_von: adminEmail,
+            freigegeben_am: new Date().toISOString(),
+            abgelehnt_grund: null
+        })
+        .eq('id', profileId);
+
+    if (error) {
+        showMessage('Fehler beim Freigeben: ' + error.message, 'error');
+        return;
+    }
+
+    showMessage('Benutzer freigegeben als ' + rolle + '.', 'success');
+
+    // Listen neu laden
+    await loadAnfragen();
+    // Badge im Header aktualisieren
+    await ladeAdminHeader(session);
+}
+
+
+/**
+ * Lehnt eine Anfrage ab: setzt status auf 'rejected'.
+ *
+ * @param {string} profileId - UUID des Profile-Eintrags
+ */
+async function lehneAb(profileId) {
+    const client = initSupabase();
+    if (!client) return;
+
+    // Optionaler Grund (prompt bietet ein kleines Eingabefeld)
+    const grund = prompt(
+        'Grund fuer die Ablehnung (optional, wird im Admin-UI gespeichert):',
+        ''
+    );
+    // null = "Abbrechen" geklickt -> nichts tun
+    if (grund === null) return;
+
+    const { data: { session } } = await client.auth.getSession();
+    const adminEmail = session?.user?.email || 'unbekannt';
+
+    const { error } = await client
+        .from('profile')
+        .update({
+            status: 'rejected',
+            abgelehnt_grund: grund || null,
+            rolle: null,
+            freigegeben_von: adminEmail,
+            freigegeben_am: new Date().toISOString()
+        })
+        .eq('id', profileId);
+
+    if (error) {
+        showMessage('Fehler beim Ablehnen: ' + error.message, 'error');
+        return;
+    }
+
+    showMessage('Anfrage abgelehnt.', 'info');
+
+    await loadAnfragen();
+    await ladeAdminHeader(session);
+}
+
+
+/**
+ * Aendert die Rolle eines bereits freigegebenen Benutzers.
+ *
+ * @param {string} profileId - UUID des Profile-Eintrags
+ * @param {string} neueRolle - 'bediener' oder 'admin'
+ */
+async function aendereRolle(profileId, neueRolle) {
+    const client = initSupabase();
+    if (!client) return;
+
+    if (neueRolle === 'admin') {
+        const ok = confirm(
+            'Soll diese Person wirklich ADMIN-Rechte bekommen?\n' +
+            'Admins koennen Produkte aendern und andere User verwalten.'
+        );
+        if (!ok) return;
+    }
+
+    const { error } = await client
+        .from('profile')
+        .update({ rolle: neueRolle })
+        .eq('id', profileId);
+
+    if (error) {
+        showMessage('Fehler beim Aendern der Rolle: ' + error.message, 'error');
+        return;
+    }
+
+    showMessage('Rolle geaendert zu: ' + neueRolle, 'success');
+    await loadAnfragen();
+}
+
+
+/**
+ * Entzieht einem freigegebenen Benutzer den Zugriff (zurueck auf pending).
+ * Loescht den User nicht - er kann sich weiter einloggen, sieht aber
+ * wieder den "Warte auf Freigabe"-Hinweis.
+ *
+ * @param {string} profileId - UUID des Profile-Eintrags
+ */
+async function entzieheFreigabe(profileId) {
+    const client = initSupabase();
+    if (!client) return;
+
+    const ok = confirm(
+        'Möchtest du den Zugriff wirklich entziehen?\n' +
+        'Der Benutzer kann sich weiter einloggen, sieht aber keine Daten mehr.'
+    );
+    if (!ok) return;
+
+    const { error } = await client
+        .from('profile')
+        .update({
+            status: 'pending',
+            rolle: null
+        })
+        .eq('id', profileId);
+
+    if (error) {
+        showMessage('Fehler: ' + error.message, 'error');
+        return;
+    }
+
+    showMessage('Zugriff entzogen. Benutzer ist wieder pending.', 'info');
+    await loadAnfragen();
+}
+
+
+// =====================================================================
 // 7. SEITEN-INITIALISIERUNG (wird beim Laden jeder Seite aufgerufen)
 // =====================================================================
 
@@ -1150,11 +1719,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('email')?.focus();
             break;
 
+        case 'register':
+            // Registrierungs-Seite: Focus aufs Namens-Feld
+            document.getElementById('voller-name')?.focus();
+            break;
+
         case 'produkte':
             // Produktliste: Session pruefen, dann Produkte laden
             const session = await checkAuth();
             if (session) {
                 displayUserInfo(session);
+                // Admin-Badge im Header laden (nur sichtbar wenn Admin)
+                await ladeAdminHeader(session);
                 await loadProdukte();
             }
             break;
@@ -1164,7 +1740,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             const detSession = await checkAuth();
             if (detSession) {
                 displayUserInfo(detSession);
+                await ladeAdminHeader(detSession);
                 await loadDetail();
+            }
+            break;
+
+        case 'anfragen':
+            // Anfragen-Seite (Admin): Session pruefen, dann Anfragen laden
+            const anfrSession = await checkAuth();
+            if (anfrSession) {
+                displayUserInfo(anfrSession);
+                await ladeAdminHeader(anfrSession);
+                await loadAnfragen();
             }
             break;
     }
