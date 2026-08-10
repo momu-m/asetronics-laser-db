@@ -271,8 +271,8 @@ function renderProdukteTabelle(produkte) {
     // WICHTIG: Alle Datenbank-Werte werden durch escapeHtml() gesichert,
     //          damit kein boeser Code (XSS) ausgefuehrt werden kann.
     tbody.innerHTML = produkte.map(p => `
-        <tr class="clickable"
-            onclick="window.location.href='detail.html?id=${escapeHtml(p.id)}'">
+        <tr class="clickable produkte-row"
+            data-produkt-id="${escapeHtml(p.id)}">
             <td><strong>${escapeHtml(p.bezeichnung)}</strong></td>
             <td class="mono">${escapeHtml(p.ase_materialnr) || '-'}</td>
             <td>${escapeHtml(p.material) || '-'}</td>
@@ -287,6 +287,14 @@ function renderProdukteTabelle(produkte) {
             <td>${formatDate(p.erstellt_am)}</td>
         </tr>
     `).join('');
+
+    // Event-Listener statt onclick (XSS-Sicherheit nach MiniMax-Review K4).
+    tbody.querySelectorAll('.produkte-row').forEach(row => {
+        row.addEventListener('click', function() {
+            const id = this.getAttribute('data-produkt-id');
+            window.location.href = 'detail.html?id=' + encodeURIComponent(id);
+        });
+    });
 }
 
 /**
@@ -455,12 +463,24 @@ function renderProgramme(programme) {
                     Konvertiert: ${formatDate(prog.konvertiert_am)}
                 </div>
             </div>
-            <button class="btn btn-download"
-                    onclick="downloadProgramm('${escapeHtml(prog.id)}', '${escapeHtml(prog.programm_name)}')">
+            <button class="btn btn-download download-btn"
+                    data-programm-id="${escapeHtml(prog.id)}"
+                    data-programm-name="${escapeHtml(prog.programm_name)}">
                 Download ZIP
             </button>
         </div>
     `).join('');
+
+    // Event-Listener sicher registieren (XSS-Schutz nach MiniMax K4).
+    // Statt onclick im HTML-Attribut (das bei ' im Namen brechen wuerde)
+    // nutzen wir data-Attribute und addEventListener.
+    container.querySelectorAll('.download-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const id = this.getAttribute('data-programm-id');
+            const name = this.getAttribute('data-programm-name');
+            downloadProgramm(id, name);
+        });
+    });
 }
 
 /**
