@@ -108,6 +108,45 @@
             </div>
         </div>
 
+        <!-- Koordinaten-Grafikvorschau: Zeichnet die Leiterplatte mit allen
+             Markierpositionen. Beschluss 10.08.2026: Mo will visuell sehen,
+             ob die Positionen plausibel sind - und verdächtige Muster
+             (Koordinaten ausserhalb der LP, identische Punkte, sehr kleine
+             Abstände) farblich markiert bekommen.
+             Bereich wird erst sichtbar, wenn Positionen geladen sind. -->
+        <div class="card" id="vorschau-block" style="display: none;">
+            <div class="card-title">
+                Koordinaten-Vorschau
+                <span class="admin-badge" style="background: var(--as-blue); color: white;">Visuell</span>
+            </div>
+            <p style="font-size: 13px; color: var(--as-text-muted); margin-bottom: 12px;">
+                Leiterplatte mit allen Markierpositionen. Positionen ausserhalb der LP,
+                identische Koordinaten oder ungewoehnliche Muster werden farblich markiert.
+            </p>
+            <div class="vorschau-container">
+                <canvas id="vorschau-canvas" width="600" height="400"></canvas>
+            </div>
+            <div class="vorschau-legende">
+                <span class="vorschau-legende-item">
+                    <span class="vorschau-legende-farbe" style="background: #2a9d8f;"></span>
+                    Position OK
+                </span>
+                <span class="vorschau-legende-item">
+                    <span class="vorschau-legende-farbe" style="background: #e76f51;"></span>
+                    Ausserhalb der LP
+                </span>
+                <span class="vorschau-legende-item">
+                    <span class="vorschau-legende-farbe" style="background: #f4a261;"></span>
+                    Identische Koordinaten (evtl. manuell geaendert)
+                </span>
+                <span class="vorschau-legende-item">
+                    <span class="vorschau-legende-farbe" style="background: #264653;"></span>
+                    Aussergewoehnlich nah beieinander
+                </span>
+            </div>
+            <div id="vorschau-warnungen" style="margin-top: 12px;"></div>
+        </div>
+
         <!-- Positionstabelle -->
         <div class="card">
             <div class="card-title">Positionen (Kontrolltabelle)</div>
@@ -123,10 +162,11 @@
                             <th class="numeric">X (mm)</th>
                             <th class="numeric">Y (mm)</th>
                             <th class="numeric">Angle</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody id="positionen-table-body">
-                        <tr><td colspan="8" class="loading-state">Lade Positionen...</td></tr>
+                        <tr><td colspan="9" class="loading-state">Lade Positionen...</td></tr>
                     </tbody>
                 </table>
             </div>

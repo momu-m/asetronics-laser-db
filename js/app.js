@@ -503,6 +503,11 @@ function renderDetail(produkt, programme, positionen) {
 
     // Positionstabelle
     renderPositionen(positionen);
+
+    // Koordinaten-Vorschau (Canvas mit Leiterplatte und Positionen).
+    // Beschluss 10.08.2026: Mo will visuell sehen, ob die Positionen
+    // plausibel sind. Verdächtige Muster werden farblich markiert.
+    renderVorschau(produkt, positionen);
 }
 
 /**
@@ -549,16 +554,24 @@ function renderProgramme(programme) {
 /**
  * Rendert die Positionstabelle.
  */
-function renderPositionen(positionen) {
+function renderPositionen(positionen, warnungen = {}) {
     const tbody = document.getElementById('positionen-table-body');
 
     if (!positionen || positionen.length === 0) {
         tbody.innerHTML =
-            '<tr><td colspan="8" class="empty-state">Keine Positionen hinterlegt.</td></tr>';
+            '<tr><td colspan="9" class="empty-state">Keine Positionen hinterlegt.</td></tr>';
         return;
     }
 
-    tbody.innerHTML = positionen.map(pos => `
+    tbody.innerHTML = positionen.map(pos => {
+        const status = warnungen[pos.posnr] || 'ok';
+        const statusLabel = {
+            ok: '<span style="color:#2a9d8f;">OK</span>',
+            ausserhalb: '<span style="color:#e76f51; font-weight:600;">Ausserhalb LP</span>',
+            identisch: '<span style="color:#f4a261; font-weight:600;">Identisch</span>',
+            nah: '<span style="color:#264653;">Sehr nah</span>'
+        }[status];
+        return `
         <tr>
             <td>${escapeHtml(pos.posnr)}</td>
             <td class="numeric">${pos.groupindex !== null ? escapeHtml(pos.groupindex) : '-'}</td>
@@ -568,8 +581,214 @@ function renderPositionen(positionen) {
             <td class="numeric">${formatNumber(pos.xpos)}</td>
             <td class="numeric">${formatNumber(pos.ypos)}</td>
             <td class="numeric">${formatNumber(pos.angle)}</td>
-        </tr>
-    `).join('');
+            <td>${statusLabel}</td>
+        </tr>`;
+    }).join('');
+}
+
+
+// =====================================================================
+// 4b. KOORDINATEN-VORSCHAU (Canvas) + PLAUSIBILITAETS-CHECK
+// =====================================================================
+// Beschluss 10.08.2026: Mo will eine grafische Vorschau der LP mit allen
+// Markierpositionen. Ausserdem eine Warnung bei verdächtigen Mustern,
+// die darauf hindeuten, dass jemand Koordinaten manuell geaendert hat.
+//
+// Folgende Verdachtsmomente werden geprueft:
+//   - ausserhalb: Koordinate liegt ausserhalb der LP-Masse
+//   - identisch:  Zwei Positionen haben exakt dieselben X/Y-Werte
+//                 (sehr unwahrscheinlich bei echter Produktion)
+//   - nah:        Abstand zwischen zwei Positionen < 0.5 mm
+//                 (ungewoehnlich nah, Kontrolle empfohlen)
+
+
+/**
+ * Prueft alle Positionen auf Plausibilitaet und gibt ein Map
+ * posnr -> status ('ok', 'ausserhalb', 'identisch', 'nah') zurueck.
+ *
+ * @param {Array} positionen
+ * @param {Object} produkt  - braucht xsize/ysize
+ * @returns {Object} { warnungen: {...}, meldungen: [...] }
+ */
+function pruefePositionen(positionen, produkt) {
+    const warnungen = {};
+    const meldungen = [];
+
+    // 1. AUSSENHALB: Position liegt ausserhalb der LP-Masse
+    const maxX = parseFloat(produkt.xsize) || 0;
+    const maxY = parseFloat(produkt.ysize) || 0;
+    if (maxX > 0 && maxY > 0) {
+        positionen.forEach(pos => {
+            const x = parseFloat(pos.xpos);
+            const y = parseFloat(pos.ypos);
+            if (isNaN(x) || isNaN(y)) return;
+            if (x < -2 || x > maxX + 2 || y < -2 || y > maxY + 2) {
+                warnungen[pos.posnr] = 'ausserhalb';
+                meldungen.push(
+                    `Position ${pos.posnr}: Koordinate (${x.toFixed(2)}, ${y.toFixed(2)}) ` +
+                    `liegt ausserhalb der LP (${maxX}x${maxY} mm).`
+                );
+            }
+        });
+    }
+
+    // 2. IDENTISCH und 3. NAH: Paarweiser Abstand
+    for (let i = 0; i < positionen.length; i++) {
+        for (let j = i + 1; j < positionen.length; j++) {
+            const a = positionen[i];
+            const b = positionen[j];
+            const ax = parseFloat(a.xpos), ay = parseFloat(a.ypos);
+            const bx = parseFloat(b.xpos), by = parseFloat(b.ypos);
+            if (isNaN(ax) || isNaN(ay) || isNaN(bx) || isNaN(by)) continue;
+            const dist = Math.sqrt((ax - bx) ** 2 + (ay - by) ** 2);
+            if (dist < 0.01) {
+                warnungen[a.posnr] = 'identisch';
+                warnungen[b.posnr] = 'identisch';
+                meldungen.push(
+                    `Positionen ${a.posnr} und ${b.posnr} haben identische Koordinaten ` +
+                    `(${ax.toFixed(2)}, ${ay.toFixed(2)}). Sehr wahrscheinlich manuell geaendert.`
+                );
+            } else if (dist < 0.5) {
+                if (!warnungen[a.posnr]) warnungen[a.posnr] = 'nah';
+                if (!warnungen[b.posnr]) warnungen[b.posnr] = 'nah';
+                meldungen.push(
+                    `Positionen ${a.posnr} und ${b.posnr} sind nur ${dist.toFixed(2)} mm ` +
+                    `aneinander entfernt. Kontrolle empfohlen.`
+                );
+            }
+        }
+    }
+
+    return { warnungen, meldungen };
+}
+
+
+/**
+ * Zeichnet die Leiterplatte mit allen Positionen auf ein Canvas.
+ * @param {Object} produkt
+ * @param {Array} positionen
+ */
+function renderVorschau(produkt, positionen) {
+    const block = document.getElementById('vorschau-block');
+    const canvas = document.getElementById('vorschau-canvas');
+    if (!block || !canvas) return;
+
+    // Vorschau nur anzeigen wenn wir Positionen haben
+    if (!positionen || positionen.length === 0) {
+        block.style.display = 'none';
+        return;
+    }
+    block.style.display = 'block';
+
+    // Plausibilitaet pruefen
+    const { warnungen, meldungen } = pruefePositionen(positionen, produkt);
+    // Tabelle mit Status-Spalte neu rendern
+    renderPositionen(positionen, warnungen);
+    // Warnungen anzeigen
+    const warnDiv = document.getElementById('vorschau-warnungen');
+    if (meldungen.length === 0) {
+        warnDiv.innerHTML = '<div style="color:#2a9d8f; font-size:13px;">' +
+            'Keine Auffaelligkeiten. Alle Positionen plausibel.</div>';
+    } else {
+        warnDiv.innerHTML = '<div style="color:#e76f51; font-size:13px; font-weight:600;">' +
+            meldungen.length + ' Auffaelligkeit(en) erkannt:</div>' +
+            '<ul style="font-size:13px; color:#555; margin-top:6px;">' +
+            meldungen.map(m => '<li>' + escapeHtml(m) + '</li>').join('') +
+            '</ul>';
+    }
+
+    // Canvas vorbereiten
+    const ctx = canvas.getContext('2d');
+    const W = canvas.width;
+    const H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+
+    // LP-Masse aus Produkt (Fallback: maximale Position)
+    let maxX = parseFloat(produkt.xsize) || 0;
+    let maxY = parseFloat(produkt.ysize) || 0;
+    if (maxX === 0 || maxY === 0) {
+        positionen.forEach(p => {
+            maxX = Math.max(maxX, parseFloat(p.xpos) || 0);
+            maxY = Math.max(maxY, parseFloat(p.ypos) || 0);
+        });
+        maxX = Math.max(maxX, 50) + 10;
+        maxY = Math.max(maxY, 50) + 10;
+    }
+
+    // Rand fuer Achsenbeschriftung
+    const margin = 40;
+    const drawW = W - 2 * margin;
+    const drawH = H - 2 * margin;
+    const scaleX = drawW / maxX;
+    const scaleY = drawH / maxY;
+    // Gleichmassiger Massstab (LP nicht verzerren)
+    const scale = Math.min(scaleX, scaleY);
+
+    // LP-Rechteck zeichnen
+    const lpX = margin;
+    const lpY = margin;
+    const lpW = maxX * scale;
+    const lpH = maxY * scale;
+
+    ctx.fillStyle = '#f8f9fa';
+    ctx.fillRect(lpX, lpY, lpW, lpH);
+    ctx.strokeStyle = '#495057';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(lpX, lpY, lpW, lpH);
+
+    // Achsenbeschriftung
+    ctx.fillStyle = '#6c757d';
+    ctx.font = '11px Inter, sans-serif';
+    ctx.fillText('0', margin - 12, margin + lpH + 14);
+    ctx.fillText(maxX.toFixed(0) + ' mm', margin + lpW - 30, margin + lpH + 14);
+    ctx.save();
+    ctx.translate(margin - 28, margin + 10);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText(maxY.toFixed(0) + ' mm', 0, 0);
+    ctx.restore();
+    ctx.fillText('X ->', margin + lpW / 2 - 10, margin + lpH + 28);
+
+    // Positionen zeichnen
+    const farben = {
+        ok:         '#2a9d8f',
+        ausserhalb: '#e76f51',
+        identisch:  '#f4a261',
+        nah:        '#264653'
+    };
+
+    positionen.forEach((pos, idx) => {
+        const px = parseFloat(pos.xpos);
+        const py = parseFloat(pos.ypos);
+        if (isNaN(px) || isNaN(py)) return;
+
+        // Y-Koordinate invertieren (LP-Ursprung unten links)
+        const cx = margin + px * scale;
+        const cy = margin + lpH - py * scale;
+        const status = warnungen[pos.posnr] || 'ok';
+        const farbe = farben[status] || farben.ok;
+
+        // Punkt zeichnen
+        ctx.beginPath();
+        ctx.arc(cx, cy, 5, 0, 2 * Math.PI);
+        ctx.fillStyle = farbe;
+        ctx.fill();
+        ctx.strokeStyle = '#fff';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Positionsnummer daneben
+        ctx.fillStyle = '#212529';
+        ctx.font = '10px IBM Plex Mono, monospace';
+        ctx.fillText(pos.posnr, cx + 7, cy - 5);
+    });
+
+    // Titel oben
+    ctx.fillStyle = '#212529';
+    ctx.font = '600 13px Inter, sans-serif';
+    ctx.fillText(
+        produkt.bezeichnung + ' - ' + positionen.length + ' Positionen',
+        margin, margin - 16
+    );
 }
 
 
