@@ -113,10 +113,18 @@ const DMC_BAUSTEINE = {
         laser3: 'rawcode-single-YYWW_DATE',
         label: 'Datum (YYWW)',
         description: 'Jahr + Woche (z.B. 2631 = Jahr 2026, Woche 31)'
+    },
+    // NEU (Session 7): plant-location fuer BM080-01HA / BM080-05HA
+    // Diese Produkte haben am Ende eine 1-stellige Werks-Kennung.
+    'plant-location': {
+        laser3: 'plantLocation_FIELD_TASK',
+        label: 'Werksstandort (Plant Location)',
+        description: '1-stelliger Code fuer den Hella-Werksstandort (z.B. 5)'
     }
 };
 
-// Die drei Composite-Variablen auf Laser 3 (aus Variables-Ordner):
+// Die Composite-Variablen auf Laser 3 (aus Variables-Ordner):
+// Session 7: plant-location-Variante fuer BM080-01HA / BM080-05HA ergaenzt.
 const COMPOSITE_VARIANTS = {
     'rawcode-single': {
         name: 'rawcode-single',
@@ -135,6 +143,13 @@ const COMPOSITE_VARIANTS = {
         cleartext: '[customerPartNumber][serial][customerPartIndex][binning]',
         match: ['part-nr', 'serial', 'rev', 'binning'],
         beschreibung: 'Fuer SET-Produkte (mehrere LPs in einem Nutzen)'
+    },
+    // NEU (Session 7): Variante mit Werksstandort am Schluss.
+    'rawcode-single-PLANT': {
+        name: 'rawcode-single-PLANT',
+        cleartext: '[fmtKundenText][serial][customerPartIndex][binning][plantLocation]',
+        match: ['part-nr', 'serial', 'rev', 'binning', 'plant-location'],
+        beschreibung: 'DMC mit Werksstandort (Plant Location) am Ende, z.B. BM080-Serie'
     }
 };
 
@@ -240,6 +255,14 @@ function dmcBerechnen() {
                 bsp: document.getElementById('b-date-bsp').value || ''
             });
         }
+        // NEU (Session 7): plant-location aus dem Baukasten lesen
+        if (document.getElementById('b-plant')?.checked) {
+            bausteine.push({
+                name: 'plant-location',
+                laenge: parseInt(document.getElementById('b-plant-len').value) || 1,
+                bsp: document.getElementById('b-plant-bsp').value || ''
+            });
+        }
     } else {
         // Freitext: Text parsen
         const text = document.getElementById('dmc-freitext-input').value;
@@ -278,13 +301,18 @@ function parseDmcFreitext(text) {
     let match;
 
     // Gueltige Baustein-Namen (case-insensitiv)
+    // Session 7: plant-location ergaenzt.
     const validNames = {
         'part-nr': 'part-nr', 'partnr': 'part-nr', 'part': 'part-nr',
         'kundenartikel': 'part-nr', 'artikel': 'part-nr',
         'serial': 'serial', 'seriennummer': 'serial', 'sernr': 'serial',
         'rev': 'rev', 'revision': 'rev', 'customerpartindex': 'rev', 'index': 'rev',
         'binning': 'binning', 'bin': 'binning', 'klasse': 'binning',
-        'datum': 'datum', 'date': 'datum', 'yyww': 'datum', 'datum-yyww': 'datum'
+        'datum': 'datum', 'date': 'datum', 'yyww': 'datum', 'datum-yyww': 'datum',
+        // NEU (Session 7): Werksstandort
+        'plant-location': 'plant-location', 'plantlocation': 'plant-location',
+        'plant': 'plant-location', 'werksstandort': 'plant-location',
+        'werk': 'plant-location', 'location': 'plant-location'
     };
 
     while ((match = pattern.exec(text)) !== null) {
@@ -294,8 +322,10 @@ function parseDmcFreitext(text) {
 
         if (mapping) {
             // Standardlaenge wenn nicht angegeben
+            // Session 7: plant-location mit Standardlaenge 1 ergaenzt.
             const standardLaenge = {
-                'part-nr': 8, 'serial': 8, 'rev': 2, 'binning': 1, 'datum': 4
+                'part-nr': 8, 'serial': 8, 'rev': 2, 'binning': 1, 'datum': 4,
+                'plant-location': 1
             }[mapping];
             bausteine.push({
                 name: mapping,
@@ -310,24 +340,36 @@ function parseDmcFreitext(text) {
 
 
 // ----- Kernlogik: Bausteine analysieren -> Variablen-Typ + CLEARTEXT -----
+// Session 7: Logik robuster gemacht fuer alle 7 Muster aus dem
+// Laser-3-Qualification-Plan. Frueher wurde nur "datum" abgefragt und
+// starr rawcode-single-WWYY gewaehlt. Jetzt pruefen wir gegen alle
+// definierten COMPOSITE_VARIANTS und nehmen die beste Uebereinstimmung.
 
 function analysiereBausteine(bausteine) {
     const namen = bausteine.map(b => b.name);
     const gesamtLaenge = bausteine.reduce((sum, b) => sum + b.laenge, 0);
 
-    // Pruefen ob "datum" dabei ist
-    const hatDatum = namen.includes('datum');
+    // Composite-Variable bestimmen: Wir zaehlen, wie viele Bausteine
+    // der Anwender gewaehlt hat, die in der "match"-Liste jeder Variante
+    // stehen. Die Variante mit der hoechsten Uebereinstimmung gewinnt.
+    // Zusaetzlich muss die Anzahl Bausteine ungefaehr stimmen, sonst
+    // wuerde z.B. rawcode-single (4 Bausteine) auch bei 5 gewaehlten
+    // passen, obwohl rawcode-single-WWYY die richtige waere.
+    let besterScore = -1;
+    let composite = COMPOSITE_VARIANTS['rawcode-single']; // Fallback
 
-    // Composite-Variable bestimmen
-    let composite;
-    if (hatDatum) {
-        composite = COMPOSITE_VARIANTS['rawcode-single-WWYY'];
-    } else {
-        // Standardfall: rawcode-single. Fuer SET-Produkte waere es rawcode-set,
-        // aber der Unterschied ist nur der Variablen-Name (fmtKundenText vs.
-        // customerPartNumber). Mohamad kann das Produkt-spezifisch entscheiden.
-        composite = COMPOSITE_VARIANTS['rawcode-single'];
-    }
+    Object.values(COMPOSITE_VARIANTS).forEach(variante => {
+        // Wie viele der gewaehlten Bausteine sind in der match-Liste?
+        const treffer = namen.filter(n => variante.match.includes(n)).length;
+        // Score: Treffer minus Abweichung in der Gesamtzahl.
+        // So gewinnt die Variante, die am besten zur Auswahl passt.
+        const abweichung = Math.abs(namen.length - variante.match.length);
+        const score = treffer * 2 - abweichung;
+        if (score > besterScore) {
+            besterScore = score;
+            composite = variante;
+        }
+    });
 
     // Beispiel-DMC zusammenbauen (aus den Bsp-Werten)
     const bspDmc = bausteine.map(b =>
@@ -340,59 +382,112 @@ function analysiereBausteine(bausteine) {
     // Schritt-fuer-Schritt Anleitung generieren
     const schritte = generiereKonfigurationsSchritte(bausteine, composite);
 
+    // Warnung, wenn die gewaehlten Bausteine nicht exakt zur Composite passen.
+    // Session 7: Pruefung in BEIDE Richtungen.
+    //   1. Gewaehlt aber nicht in Composite -> Baustein wird ignoriert
+    //   2. In Composite aber nicht gewaehlt  -> Composite erwartet etwas das fehlt
+    //      (z.B. VW055-00 hat kein part-nr, aber rawcode-single-WWYY erwartet fmtKundenText)
+    let warnung = null;
+    const fehlendeInComposite = namen.filter(n => !composite.match.includes(n));
+    const fehlendeInAuswahl = composite.match.filter(n => !namen.includes(n));
+
+    if (fehlendeInComposite.length > 0 || fehlendeInAuswahl.length > 0) {
+        const teile = [];
+        if (fehlendeInComposite.length > 0) {
+            teile.push('Gewaehlt aber nicht in Composite: ' + fehlendeInComposite.join(', '));
+        }
+        if (fehlendeInAuswahl.length > 0) {
+            teile.push('Composite erwartet aber nicht gewaehlt: ' + fehlendeInAuswahl.join(', '));
+        }
+        warnung = 'Achtung: Die Auswahl passt nicht exakt zur empfohlenen Composite-Variante. ' +
+            teile.join(' | ') +
+            ' Bitte Struktur manuell pruefen oder eine eigene Composite anlegen.';
+    }
+
     return {
         composite,
         gesamtLaenge,
         bspDmc,
         label,
         schritte,
-        namen
+        namen,
+        warnung
     };
 }
 
 
 // ----- Generiert Schritt-fuer-Schritt Anleitung fuer Laser 3 -----
+// Session 7: Schritte werden jetzt dynamisch aus den gewaehlten Bausteinen
+// abgeleitet. So erscheint z.B. der Datum-Schritt nur, wenn "datum"
+// ausgewaehlt wurde, und der plant-location-Schritt nur bei Bedarf.
 
 function generiereKonfigurationsSchritte(bausteine, composite) {
     const schritte = [];
+    const namen = bausteine.map(b => b.name);
 
+    // Schritt 1: immer - Composite-Variable anlegen
     schritte.push({
         nr: 1,
-        titel: 'Composite-Variable wählen',
-        detail: `In Simplex Variable "rawcode-single" (oder "${composite.name}") als COMPOSITE anlegen. ` +
-                'CLEARTEXT-Formel exakt wie unten angegeben uebernehmen.'
+        titel: 'Composite-Variable anlegen',
+        detail: 'In Simplex eine neue COMPOSITE-Variable mit dem Namen "' +
+                composite.name + '" anlegen. CLEARTEXT-Formel exakt wie oben angegeben uebernehmen.'
     });
 
-    schritte.push({
-        nr: 2,
-       titel: 'fmtKundenText-Feld konfigurieren',
-        detail: 'FIELD-Typ, CONNECTION=3. Wert kommt vom Job (Kunden-Artikelnummer).'
-    });
+    let nr = 2;
 
-    schritte.push({
-        nr: 3,
-        titel: 'serial-Converter konfigurieren',
-        detail: 'CONVERTER-Typ, LENGTH=99, STARTPOSITION=1. ' +
-                'Liest die laufende Seriennummer aus dem Job.'
-    });
-
-    schritte.push({
-        nr: 4,
-        titel: 'customerPartIndex-Feld',
-        detail: 'FIELD-Typ, CONNECTION=3. Wert = Revisionslevel (z.B. "01").'
-    });
-
-    schritte.push({
-        nr: 5,
-        titel: 'binning-Feld',
-        detail: 'FIELD-Typ, CONNECTION=3. Wert = Sortierklasse (1-9).'
-    });
-
-    if (composite.name === 'rawcode-single-WWYY') {
+    // Schritt fuer part-nr (nur wenn ausgewaehlt - wichtig fuer VW055-00
+    // das KEINE part-nr hat)
+    if (namen.includes('part-nr')) {
         schritte.push({
-            nr: 6,
-            titel: 'rawcode-single-YYWW_DATE',
+            nr: nr++,
+            titel: 'fmtKundenText-Feld (part-nr)',
+            detail: 'FIELD-Typ, CONNECTION=3. Wert kommt vom Job (Kunden-Artikelnummer wie A45A0910).'
+        });
+    }
+
+    // Schritt fuer serial
+    if (namen.includes('serial')) {
+        schritte.push({
+            nr: nr++,
+            titel: 'serial_CONVERTER (serial)',
+            detail: 'CONVERTER-Typ, LENGTH=99, STARTPOSITION=1. Liest die laufende Seriennummer aus dem Job.'
+        });
+    }
+
+    // Schritt fuer rev
+    if (namen.includes('rev')) {
+        schritte.push({
+            nr: nr++,
+            titel: 'customerPartIndex-Feld (rev)',
+            detail: 'FIELD-Typ, CONNECTION=3. Wert = Revisionslevel (z.B. "01").'
+        });
+    }
+
+    // Schritt fuer binning
+    if (namen.includes('binning')) {
+        schritte.push({
+            nr: nr++,
+            titel: 'binning-Feld (binning)',
+            detail: 'FIELD-Typ, CONNECTION=3. Wert = Sortierklasse (1 bis 9 bzw. mehrstellig).'
+        });
+    }
+
+    // Schritt fuer datum (nur bei WWYY-Variante)
+    if (namen.includes('datum')) {
+        schritte.push({
+            nr: nr++,
+            titel: 'rawcode-single-YYWW_DATE (datum)',
             detail: 'DATE-Typ, FORMAT="%W%y" (Woche+Jahr). Aktuell z.B. "3126" = KW 31 / 2026.'
+        });
+    }
+
+    // Schritt fuer plant-location (NEU Session 7)
+    if (namen.includes('plant-location')) {
+        schritte.push({
+            nr: nr++,
+            titel: 'plantLocation-Feld (plant-location)',
+            detail: 'FIELD-Typ, CONNECTION=3. Wert = 1-stelliger Werksstandort-Code (z.B. 5). ' +
+                    'Speziell fuer BM080-Serie erforderlich.'
         });
     }
 
@@ -404,6 +499,16 @@ function generiereKonfigurationsSchritte(bausteine, composite) {
 
 function renderDmcErgebnis(bausteine, erg) {
     const html = [];
+
+    // 0. Warnung anzeigen, falls ein Baustein nicht zur Composite passt
+    // (Session 7: neuer Sicherheits-Check)
+    if (erg.warnung) {
+        html.push(`
+            <div class="alert alert-error" style="margin-bottom: 16px;">
+                ${escapeHtml(erg.warnung)}
+            </div>
+        `);
+    }
 
     // 1. Empfohlene Variable (grosses Highlight)
     html.push(`

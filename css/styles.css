@@ -1319,3 +1319,209 @@ td.mono { font-family: var(--font-mono); font-size: 12px; }
         padding: 6px 4px;
     }
 }
+
+
+/* =====================================================================
+   SESSION 7: Qualifikations-Plan / Ruest-Assistent
+   ===================================================================== */
+
+/* Stat-Cards oben auf der Qualifikations-Seite */
+.qualifikation-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.stat-card {
+    background: var(--as-surface);
+    border: 1px solid var(--as-border);
+    border-radius: 6px;
+    padding: 16px;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+}
+
+.stat-card .stat-wert {
+    font-size: 32px;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    color: var(--as-primary);
+    line-height: 1.1;
+}
+
+.stat-card .stat-label {
+    font-size: 12px;
+    color: var(--as-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 4px;
+}
+
+/* Farbe der Stat-Cards je nach Status */
+.stat-card.stat-eingefahren .stat-wert { color: #2A9D5C; }
+.stat-card.stat-programmiert .stat-wert { color: #0078D4; }
+.stat-card.stat-offen .stat-wert { color: #E8A33D; }
+.stat-card.stat-total .stat-wert { color: var(--as-primary); }
+
+@media (max-width: 600px) {
+    .qualifikation-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+
+/* Status-Badge-Varianten fuer Qualifikation */
+.badge-success { background: #E6F4EC; color: #1B6B3E; border: 1px solid #B8DCC4; }
+.badge-warning { background: #FCF1E1; color: #8B5A0E; border: 1px solid #F0DCAE; }
+.badge-info    { background: #E1EEF9; color: #0A4A8A; border: 1px solid #BFD7F0; }
+.badge-error   { background: #FCE8E8; color: #8B2424; border: 1px solid #F0BFBF; }
+.badge-default { background: var(--as-bg); color: var(--as-text-muted); border: 1px solid var(--as-border); }
+
+
+/* Tabellen-Zeilen Hover-Effekt */
+.produkt-tabelle tbody tr:hover {
+    background: var(--as-bg);
+}
+
+
+/* Modal (Detail-Ansicht) */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.modal-fenster {
+    background: var(--as-surface);
+    border-radius: 8px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+    max-width: 900px;
+    width: 100%;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid var(--as-border);
+    position: sticky;
+    top: 0;
+    background: var(--as-surface);
+    z-index: 1;
+}
+
+.modal-header h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--as-primary);
+    margin: 0;
+}
+
+.modal-body {
+    padding: 20px;
+}
+
+/* Detail-Grid fuer Modal-Inhalt */
+.detail-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+@media (max-width: 768px) {
+    .detail-grid {
+        grid-template-columns: 1fr;
+    }
+    .modal-fenster {
+        max-height: 95vh;
+    }
+}
+
+/* Detail-Tabelle (Produktdaten im Modal) */
+.detail-tabelle {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.detail-tabelle td {
+    padding: 8px 6px;
+    border-bottom: 1px solid var(--as-border);
+    vertical-align: top;
+}
+
+.detail-tabelle td:first-child {
+    color: var(--as-text-muted);
+    width: 45%;
+}
+
+.detail-tabelle td:last-child {
+    font-weight: 500;
+}
+
+/* Einfahr-Checkliste */
+.einfahr-checkliste {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    counter-reset: schritt;
+}
+
+.einfahr-checkliste li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px;
+    border: 1px solid var(--as-border);
+    border-radius: 4px;
+    margin-bottom: 8px;
+    background: var(--as-bg);
+}
+
+.einfahr-checkliste li::before {
+    counter-increment: schritt;
+    content: counter(schritt);
+    background: var(--as-primary);
+    color: white;
+    font-weight: 600;
+    font-size: 13px;
+    width: 28px;
+    height: 28px;
+    min-width: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.einfahr-checkbox {
+    margin-top: 3px;
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--as-primary);
+}
+
+/* Meldungs-Zeilen in der Tabelle */
+.loading-row, .empty-row, .error-row {
+    text-align: center;
+    padding: 24px !important;
+    color: var(--as-text-muted);
+}
+
+.error-row {
+    color: #8B2424;
+}
+

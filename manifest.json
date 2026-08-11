@@ -1,0 +1,27 @@
+{
+  "name": "ALPA - Asetronics Laser-Programm-Archiv",
+  "short_name": "ALPA",
+  "description": "Verwaltung konvertierter Laser-3-Programme",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#F5F6F8",
+  "theme_color": "#003366",
+  "lang": "de",
+  "categories": ["productivity", "business"],
+  "icons": [
+    {
+      "src": "assets/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

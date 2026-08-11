@@ -12,6 +12,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#003366">
 </head>
 <body data-page="rechner">
 
@@ -31,6 +33,7 @@
                     Anfragen <span id="anfragen-count-badge" class="anfragen-count-badge" style="display:none;">0</span>
                 </a>
                 <a href="produkte.html" class="btn btn-secondary btn-sm">Produkte</a>
+                <a href="qualifikation.html" class="btn btn-secondary btn-sm">Qualifikation</a>
                 <button class="btn btn-secondary btn-sm" onclick="logout()">Abmelden</button>
             </div>
         </div>
@@ -138,6 +141,13 @@
                                         <td><input type="number" id="b-date-len" value="4" min="4" max="4" disabled></td>
                                         <td><input type="text" id="b-date-bsp" value="2631" onchange="dmcBerechnen()"></td>
                                     </tr>
+                                    <!-- NEU (Session 7): plant-location fuer BM080-01HA / BM080-05HA -->
+                                    <tr>
+                                        <td><input type="checkbox" id="b-plant" onchange="dmcBerechnen()"></td>
+                                        <td>Werksstandort (plant location)</td>
+                                        <td><input type="number" id="b-plant-len" value="1" min="1" max="3" onchange="dmcBerechnen()"></td>
+                                        <td><input type="text" id="b-plant-bsp" value="5" onchange="dmcBerechnen()"></td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
@@ -155,7 +165,7 @@
                                 value="<part-nr(8)><serial(8)><rev(2)><binning(1)>"
                                 oninput="dmcBerechnen()">
                             <p class="rechner-hint" style="margin-top: 6px;">
-                                Bekannte Baustein-Namen: part-nr, serial, rev, binning, datum.
+                                Bekannte Baustein-Namen: part-nr, serial, rev, binning, datum, plant-location.
                                 Zahl in Klammern = Zeichenanzahl.
                             </p>
                         </div>
@@ -325,5 +335,6 @@
     <script src="js/app.js"></script>
     <script src="js/rechner.js"></script>
 
+    <script src="js/pwa.js"></script>
 </body>
 </html>
