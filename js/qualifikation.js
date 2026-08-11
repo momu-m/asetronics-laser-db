@@ -232,7 +232,7 @@ function erzeugeZeile(p) {
             <td>${escapeHtml(kuerzeWerk(p.hella_plant))}</td>
             <td class="mono" style="font-size:11px;">${escapeHtml(dmcKurz || '-')}</td>
             <td>${datumFormatiert}</td>
-            <td><span class="badge ${badgeKlasse}">${escapeHtml(p.einfahrstatus || '-')}</span></td>
+            <td>${erzeugeStatusBadgeFuerTabelle(p, badgeKlasse)}</td>
             <td>
                 <button class="btn btn-primary btn-sm" onclick="event.stopPropagation(); oeffneDetailModal('${p.id}');">
                     Details
@@ -254,6 +254,22 @@ function erzeugeStatusBadgeKlasse(status) {
         case 'abgelehnt':    return 'badge-error';
         default:             return 'badge-default';
     }
+}
+
+
+// Erzeugt das Badge fuer die Tabellen-Zeile. Bei Admins ist es klickbar
+// (zyklischer Wechsel: offen -> programmiert -> eingefahren).
+function erzeugeStatusBadgeFuerTabelle(p, badgeKlasse) {
+    const status = escapeHtml(p.einfahrstatus || '-');
+    if (istAdmin) {
+        // Klickbar fuer Admins: beim Klick auf das Badge zyklisch weiter schalten
+        return `<span class="badge ${badgeKlasse}" ` +
+               `onclick="schnellWechselStatus('${p.id}', event)" ` +
+               `style="cursor:pointer; user-select:none;" ` +
+               `title="Klick zum Wechseln: offen -> programmiert -> eingefahren">` +
+               `${status}</span>`;
+    }
+    return `<span class="badge ${badgeKlasse}">${status}</span>`;
 }
 
 
@@ -302,10 +318,31 @@ function oeffneDetailModal(id) {
                     <tr><td>Jahresstueckzahl</td><td>${escapeHtml(p.stueckzahl || '-')}</td></tr>
                     <tr><td>DMC-Dokument</td><td class="mono">${escapeHtml(p.dmc_dokument || '-')}</td></tr>
                     <tr><td>Einfahrdatum</td><td>${p.einfahrdatum ? new Date(p.einfahrdatum).toLocaleDateString('de-CH') : '-'}</td></tr>
-                    <tr><td>Status</td><td><span class="badge ${erzeugeStatusBadgeKlasse(p.einfahrstatus)}">${escapeHtml(p.einfahrstatus || '-')}</span></td></tr>
+                    <tr><td>Status</td><td>${erzeugeStatusAnzeige(p)}</td></tr>
                     ${p.bemerkung ? `<tr><td>Bemerkung</td><td>${escapeHtml(p.bemerkung)}</td></tr>` : ''}
                 </table>
             </div>
+
+            <!-- Status-Aendern-Karte (nur fuer Admins) -->
+            ${istAdmin ? `
+            <div class="card" style="grid-column: 1 / -1;">
+                <div class="card-title">Status aendern (nur Admin)</div>
+                <div style="display:flex; gap:12px; align-items:center; flex-wrap:wrap;">
+                    <select id="status-dropdown-${p.id}" class="toolbar-select" style="min-width:220px;">
+                        <option value="offen" ${p.einfahrstatus === 'offen' ? 'selected' : ''}>Offen</option>
+                        <option value="programmiert" ${p.einfahrstatus === 'programmiert' ? 'selected' : ''}>Programmiert</option>
+                        <option value="in_pruefung" ${p.einfahrstatus === 'in_pruefung' ? 'selected' : ''}>In Pruefung</option>
+                        <option value="eingefahren" ${p.einfahrstatus === 'eingefahren' ? 'selected' : ''}>Eingefahren</option>
+                        <option value="abgeschlossen" ${p.einfahrstatus === 'abgeschlossen' ? 'selected' : ''}>Abgeschlossen</option>
+                        <option value="abgelehnt" ${p.einfahrstatus === 'abgelehnt' ? 'selected' : ''}>Abgelehnt</option>
+                    </select>
+                    <button class="btn btn-primary btn-sm" onclick="speichereStatus('${p.id}')">
+                        Status speichern
+                    </button>
+                    <span id="status-feedback-${p.id}" style="font-size:12px; color:var(--as-text-muted);"></span>
+                </div>
+            </div>
+            ` : ''}
 
             <!-- DMC-Empfehlung -->
             <div class="card">
@@ -375,6 +412,152 @@ function oeffneDetailModal(id) {
 
 function schliesseDetailModal() {
     document.getElementById('detail-modal').style.display = 'none';
+}
+
+
+// =====================================================================
+// 7b. STATUS-AENDERUNG (nur fuer Admins)
+// =====================================================================
+
+// Erzeugt die Status-Anzeige: fuer Nicht-Admins nur ein Badge (lesen),
+// fuer Admins erscheint zusaetzlich die Aendern-Karte weiter unten.
+function erzeugeStatusAnzeige(p) {
+    const badgeKlasse = erzeugeStatusBadgeKlasse(p.einfahrstatus);
+    let html = `<span class="badge ${badgeKlasse}">${escapeHtml(p.einfahrstatus || '-')}</span>`;
+    if (istAdmin) {
+        html += ' <span style="font-size:11px; color:var(--as-text-muted); margin-left:6px;">' +
+                '(Aenderung unten moeglich)</span>';
+    }
+    return html;
+}
+
+
+// Speichert den neuen Status in der Datenbank.
+// Wird vom Button "Status speichern" im Detail-Modal aufgerufen.
+async function speichereStatus(produktId) {
+    const client = initSupabase();
+    if (!client) return;
+
+    // Sicherheitscheck: nur Admins duerfen aendern
+    if (!istAdmin) {
+        zeigeStatusFeedback(produktId, 'Nur Admins duerfen den Status aendern.', true);
+        return;
+    }
+
+    // Gewaehlten Wert aus dem Dropdown lesen
+    const dropdown = document.getElementById('status-dropdown-' + produktId);
+    if (!dropdown) return;
+    const neuerStatus = dropdown.value;
+
+    const feedback = document.getElementById('status-feedback-' + produktId);
+    if (feedback) {
+        feedback.textContent = 'Speichere...';
+        feedback.style.color = 'var(--as-text-muted)';
+    }
+
+    try {
+        // Update in der qualification-Tabelle
+        const { error } = await client
+            .from('qualification')
+            .update({
+                einfahrstatus: neuerStatus,
+                // Wenn Status auf eingefahren/abgeschlossen gesetzt wird,
+                // und kein Datum existiert, setzen wir es auf heute.
+                einfahrdatum: (neuerStatus === 'eingefahren' || neuerStatus === 'abgeschlossen')
+                    ? new Date().toISOString().split('T')[0]
+                    : undefined
+            })
+            .eq('id', produktId);
+
+        if (error) throw error;
+
+        // Lokale Daten aktualisieren (damit Tabelle sofort passt)
+        const idx = window.alleQualifikationen.findIndex(x => x.id === produktId);
+        if (idx >= 0) {
+            window.alleQualifikationen[idx].einfahrstatus = neuerStatus;
+        }
+
+        // UI aktualisieren: Stats, Tabelle, und Badge im Modal
+        aktualisiereStats();
+        zeigeQualifikationen();
+
+        // Status-Badge oben im Modal direkt ersetzen (ohne kompletten Reload)
+        // Wir aktualisieren nur die sichtbare Status-Anzeige durch Neu-Oeffnen.
+        if (feedback) {
+            feedback.textContent = 'Gespeichert: ' + neuerStatus;
+            feedback.style.color = '#2A9D5C';
+        }
+
+        // Nach kurzer Pause das Modal aktualisieren, damit das neue Badge sichtbar wird
+        setTimeout(() => oeffneDetailModal(produktId), 800);
+    } catch (fehler) {
+        console.error('Fehler beim Speichern des Status:', fehler);
+        if (feedback) {
+            feedback.textContent = 'Fehler: ' + (fehler.message || fehler);
+            feedback.style.color = '#C0392B';
+        }
+    }
+}
+
+
+// Hilfsfunktion: kurzes Feedback anzeigen
+function zeigeStatusFeedback(produktId, text, istFehler) {
+    const feedback = document.getElementById('status-feedback-' + produktId);
+    if (feedback) {
+        feedback.textContent = text;
+        feedback.style.color = istFehler ? '#C0392B' : 'var(--as-text-muted)';
+    }
+}
+
+
+// =====================================================================
+// 7c. SCHNELL-STATUS-WECHSEL direkt in der Tabelle (fuer Admins)
+// =====================================================================
+// Wird beim Klick auf das Badge in der Tabellen-Zeile aufgerufen.
+// Schaltet den Status zyklisch weiter: offen -> programmiert -> eingefahren -> offen
+
+async function schnellWechselStatus(produktId, event) {
+    // Klick stoppen, sonst oeffnet sich das Modal
+    if (event) event.stopPropagation();
+
+    // Nur Admins
+    if (!istAdmin) return;
+
+    const client = initSupabase();
+    if (!client) return;
+
+    // Aktuelles Produkt finden
+    const p = window.alleQualifikationen.find(x => x.id === produktId);
+    if (!p) return;
+
+    // Zyklischer Wechsel: offen -> programmiert -> eingefahren -> offen
+    const zyklus = ['offen', 'programmiert', 'eingefahren'];
+    const aktuell = p.einfahrstatus || 'offen';
+    const aktuellerIndex = zyklus.indexOf(aktuell);
+    // Falls Status nicht im Zyklus (z.B. in_pruefung), fangen wir bei 'offen' an
+    const naechsterIndex = aktuellerIndex >= 0 ? (aktuellerIndex + 1) % zyklus.length : 0;
+    const neuerStatus = zyklus[naechsterIndex];
+
+    try {
+        const { error } = await client
+            .from('qualification')
+            .update({ einfahrstatus: neuerStatus })
+            .eq('id', produktId);
+
+        if (error) throw error;
+
+        // Lokale Daten aktualisieren
+        const idx = window.alleQualifikationen.findIndex(x => x.id === produktId);
+        if (idx >= 0) {
+            window.alleQualifikationen[idx].einfahrstatus = neuerStatus;
+        }
+
+        aktualisiereStats();
+        zeigeQualifikationen();
+    } catch (fehler) {
+        console.error('Fehler beim Status-Wechsel:', fehler);
+        alert('Fehler beim Speichern: ' + (fehler.message || fehler));
+    }
 }
 
 
