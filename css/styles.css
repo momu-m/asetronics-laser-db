@@ -1525,6 +1525,7 @@ td.mono { font-family: var(--font-mono); font-size: 12px; }
     color: #8B2424;
 }
 
+
 /* =====================================================================
    Konverter-Warnungen (Neu 20.08.2026, Wunsch Mohamad)
    Der Batch-Konverter prueft Koordinaten und Reihenfolge. Produkte
@@ -1587,3 +1588,232 @@ td.mono { font-family: var(--font-mono); font-size: 12px; }
     font-style: italic;
 }
 
+
+/* =====================================================================
+   NEU 21.08.2026: Admin-Bearbeitung (Bearbeiten-Modal, Archiv,
+   Papierkorb, Kommentare, Audit-Log)
+   ===================================================================== */
+
+/* Graues ARCHIV-Badge neben dem Status in der Produkt-Tabelle */
+.badge-archiv {
+    background: rgba(90, 100, 120, 0.15);
+    color: var(--as-text-muted);
+    border: 1px solid var(--as-border);
+}
+
+/* Archivierte Zeilen leicht ausgegraut - sofort erkennbar */
+.row-archiv { opacity: 0.62; }
+.row-archiv:hover { opacity: 1; }
+
+/* Checkbox-Label "Archiv anzeigen" in der Toolbar */
+.archiv-filter-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--as-text);
+    padding: 9px 12px;
+    border: 1px solid var(--as-border);
+    border-radius: 4px;
+    background: var(--as-surface);
+    cursor: pointer;
+    user-select: none;
+    white-space: nowrap;
+}
+.archiv-filter-label input {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    accent-color: var(--as-primary);
+}
+
+/* Kommentar-Liste auf der Detailseite */
+.kommentar-item {
+    padding: 12px 14px;
+    border: 1px solid var(--as-border);
+    border-radius: 6px;
+    margin-bottom: 10px;
+    background: var(--as-bg);
+}
+
+.kommentar-kopf {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 12px;
+    color: var(--as-text-muted);
+    margin-bottom: 6px;
+}
+
+.kommentar-kopf strong {
+    color: var(--as-text);
+}
+
+.kommentar-datum {
+    flex: 1;
+}
+
+.kommentar-del-btn {
+    padding: 2px 10px;
+    min-height: 26px;
+    font-size: 11px;
+}
+
+.kommentar-text {
+    font-size: 14px;
+    color: var(--as-text);
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+/* Eingabeformular fuer neue Kommentare */
+.kommentar-form {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+    align-items: flex-start;
+}
+
+.kommentar-form textarea {
+    flex: 1;
+    resize: vertical;
+    min-height: 44px;
+}
+
+/* Audit-Log: farbige alt/neu-Werte */
+.audit-alt {
+    color: var(--st-gesperrt-fg);
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+    opacity: 0.8;
+}
+
+.audit-neu {
+    color: var(--st-freigegeben-fg);
+    font-weight: 500;
+}
+
+/* Karten-Varianten auf der Verwaltungsseite */
+.anfrage-karte-archiv {
+    border-left: 4px solid #5A6478;
+}
+
+.anfrage-karte-geloescht {
+    border-left: 4px solid #C62828;
+    opacity: 0.85;
+}
+
+
+/* =====================================================================
+   NEU 21.08.2026: DARK-MODE (dunkles Layout fuer alle Seiten)
+   ---------------------------------------------------------------------
+   Funktionsweise: js/theme.js setzt am <html>-Element das Attribut
+   data-theme="dark" (Auswahl wird in localStorage gespeichert).
+   Dieser Block ueberschreibt ALLE CSS-Variablen auf dunkle Werte.
+   Danach folgen gezielte Korrekturen fuer Stellen, die vorher
+   hartkodierte helle Farben hatten.
+   ===================================================================== */
+
+[data-theme="dark"] {
+    /* Primaerfarben: helleres Blau fuer guten Kontrast auf dunkel */
+    --as-primary:       #3B82C4;
+    --as-primary-hover: #4E96D4;
+    --as-accent:        #5CA7E8;
+    --as-blue:          #5CA7E8;
+
+    /* Flaechen: dunkles Blaugrau (Industrie-Look) */
+    --as-bg:            #12161F;
+    --as-surface:       #1A2029;
+    --as-surface-hover: #232B37;
+
+    /* Text */
+    --as-text:          #E5EAF2;
+    --as-text-muted:    #98A2B3;
+
+    /* Trennlinien */
+    --as-border:        #2E3743;
+
+    /* Status-Farben: helle Vordergrundfarben auf dunklem Grund */
+    --st-konvertiert-fg:    #B8C0CC;
+    --st-konvertiert-bg:    rgba(184, 192, 204, 0.12);
+    --st-testgelasert-fg:   #E3B341;
+    --st-testgelasert-bg:   rgba(227, 179, 65, 0.14);
+    --st-freigegeben-fg:    #57C785;
+    --st-freigegeben-bg:    rgba(87, 199, 133, 0.13);
+    --st-gesperrt-fg:       #F07178;
+    --st-gesperrt-bg:       rgba(240, 113, 120, 0.14);
+
+    /* Schatten: staerker fuer Tiefe auf dunklem Grund */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 1px 3px rgba(0, 0, 0, 0.45), 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+/* --- Korrekturen fuer bisher hartkodierte Farben (Dark-Mode) --- */
+
+/* Info-Meldung: dunkelblaue statt weisse Flaeche */
+[data-theme="dark"] .alert-info {
+    background: rgba(92, 167, 232, 0.10);
+    color: #8CC4F0;
+    border-color: rgba(92, 167, 232, 0.30);
+}
+
+/* Gefahr-Button (Ablehnen/Loeschen): dunkle Variante */
+[data-theme="dark"] .btn-danger-ghost {
+    color: #F07178;
+    border-color: #5A2E33;
+    background: var(--as-surface);
+}
+[data-theme="dark"] .btn-danger-ghost:hover {
+    background: rgba(240, 113, 120, 0.10);
+    border-color: #F07178;
+}
+
+/* Session-7-Badges: dunkle Hintergruende */
+[data-theme="dark"] .badge-success { background: rgba(87, 199, 133, 0.13); color: #57C785; border: 1px solid rgba(87, 199, 133, 0.30); }
+[data-theme="dark"] .badge-warning { background: rgba(227, 179, 65, 0.13); color: #E3B341; border: 1px solid rgba(227, 179, 65, 0.30); }
+[data-theme="dark"] .badge-info    { background: rgba(92, 167, 232, 0.12); color: #8CC4F0; border: 1px solid rgba(92, 167, 232, 0.30); }
+[data-theme="dark"] .badge-error   { background: rgba(240, 113, 120, 0.13); color: #F07178; border: 1px solid rgba(240, 113, 120, 0.30); }
+
+/* Konverter-Warnungen (rot): dunkle Variante */
+[data-theme="dark"] .row-warnung { background: rgba(198, 40, 40, 0.16); }
+[data-theme="dark"] .row-warnung:hover { background: rgba(198, 40, 40, 0.26) !important; }
+
+[data-theme="dark"] .warnung-block {
+    background: rgba(198, 40, 40, 0.12);
+    border-color: #C62828;
+    border-left-color: #C62828;
+}
+[data-theme="dark"] .warnung-titel { color: #F49A9A; }
+[data-theme="dark"] .warnung-block ul { color: #E8A5A5; }
+[data-theme="dark"] .warnung-hinweis { color: #F49A9A; }
+
+/* Rechner-Bloecke mit hellen Hintergruenden */
+[data-theme="dark"] .dmc-cleartext { background: #232B37; color: var(--as-text); }
+[data-theme="dark"] .dmc-beispiel { background: rgba(59, 130, 196, 0.18); color: #8CC4F0; }
+[data-theme="dark"] .dmc-struktur-item { background: #232B37; }
+
+/* Fehlerzeile in Qualifikations-Tabelle */
+[data-theme="dark"] .error-row { color: #F07178; }
+
+/* Login-Bereich: Brand-Panel bleibt dunkelblau (Kontrast zu weissem
+   Logo bleibt erhalten), Formular-Seite uebernimmt dunkle Variablen
+   automatisch. Der schwebende Theme-Button braucht einen Halo, damit
+   er auf dem Brand-Panel lesbar bleibt. */
+.theme-toggle-login {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 1100;
+}
+
+[data-theme="dark"] .theme-toggle-login {
+    background: rgba(26, 32, 41, 0.85);
+    backdrop-filter: blur(4px);
+}
+
+/* Brand-Panel links: bleibt dunkelblau (damit Logo und weisser Text
+   auch im Dark-Mode guten Kontrast behalten - das hellere --as-primary
+   des Dark-Modes ist fuer weisse Schrift zu schwach) */
+[data-theme="dark"] .login-brand {
+    background: #0E2A4A;
+}
