@@ -1,0 +1,2250 @@
+{
+ "erstellt": "2026-08-21",
+ "quelle": "Analyse der Original-Dateien von Laser 1/2 (21.08.2026)",
+ "massstab": [
+  {
+   "variable": "rawcode-single",
+   "inhalt": "[fmtKundenText][serial][customerPartIndex][binning]",
+   "bedeutung": "Teilenummer + Seriennummer + Revision + Binning",
+   "referenzen": "DA255-00, NCV3SMLR, PDLS5841, BM253-01, MC System 360-01 (eingefahren)"
+  },
+  {
+   "variable": "rawcode-single-WWYY",
+   "inhalt": "[fmtKundenText][serial][customerPartIndex][binning][rawcode-single-YYWW_DATE]",
+   "bedeutung": "Teilenummer + Seriennummer + Revision + Binning + Datum (WWYY)",
+   "referenzen": "VW053-01, FO165-00 (eingefahren)"
+  }
+ ],
+ "bausteine": [
+  {
+   "l12": "OrderReserve1 / Reserve2 / PO613 6-Digit",
+   "rolle": "Teilenummer",
+   "l3": "fmtKundenText"
+  },
+  {
+   "l12": "C-SerialNumber",
+   "rolle": "Seriennummer",
+   "l3": "serial"
+  },
+  {
+   "l12": "OrderC-Revision / Reserve3 / BM57x Index",
+   "rolle": "Revision",
+   "l3": "customerPartIndex"
+  },
+  {
+   "l12": "Reserve1",
+   "rolle": "Binning",
+   "l3": "binning"
+  },
+  {
+   "l12": "WWYY_DATE / OrderProduction-Date",
+   "rolle": "Datum",
+   "l3": "rawcode-single-YYWW_DATE"
+  },
+  {
+   "l12": "BM054_FIELD (XX) / 99_FIELD (99) / LeerschlagVariable",
+   "rolle": "fester Wert",
+   "l3": "einzeln loesen"
+  }
+ ],
+ "gruppen_info": {
+  "A": {
+   "titel": "Gruppe A: kein Binning im Code",
+   "kurz": "kein Binning",
+   "beschreibung": "Variable auf L1/2 enthaelt nur Teilenummer + Seriennummer + Revision, kein Binning-Feld.",
+   "empfehlung": "rawcode-single mit leerem binning-Feld, oder eigene Composite ohne binning. Ein Produkt testlasern."
+  },
+  "B": {
+   "titel": "Gruppe B: andere Reihenfolge (Revision VOR Seriennummer)",
+   "kurz": "Reihenfolge",
+   "beschreibung": "Code-Reihenfolge ist Teilenummer + Revision + Seriennummer (+ Binning + Datum). Die Reihenfolge im DMC darf nicht geaendert werden.",
+   "empfehlung": "Eigene Composite in dieser Reihenfolge anlegen. NICHT die Standard-Variable nehmen."
+  },
+  "C": {
+   "titel": "Gruppe C: fester Wert 99 im Code",
+   "kurz": "festes 99",
+   "beschreibung": "Struktur: Teil + Serial + Rev + Binning + festes '99' + Datum.",
+   "empfehlung": "Eigene Composite mit festem Textfeld '99'. DMC-Dok pruefen, was die 99 bedeutet."
+  },
+  "D": {
+   "titel": "Gruppe D: BM916 (mehrere DMC-Varianten)",
+   "kurz": "BM916 Multi",
+   "beschreibung": "Haupt-DMC: Teil+Serial+Rev+Binning+Datum. Zusaetzlich Nutzendmc mit festem '99'.",
+   "empfehlung": "Haupt-DMC rawcode-single-WWYY. Nutzendmc eigene Composite. Mit altem Ausdruck vergleichen."
+  },
+  "E": {
+   "titel": "Gruppe E: DA802 (Nutzenrand mit Leerschlaegen)",
+   "kurz": "Leerschlag",
+   "beschreibung": "Nutzen-DMC: Teil + Rev + 2 Leerschlaege + Serial + Binning + Datum. Zusaetzlich SET-DMC ohne Teilenummer.",
+   "empfehlung": "Spezialloesung mit eigenen Composites. DMC-Dok und alter Ausdruck sichern."
+  },
+  "F": {
+   "titel": "Gruppe F: VW055-00 (15 Zeichen, keine Teilenummer)",
+   "kurz": "ohne part",
+   "beschreibung": "Nur Seriennummer + Revision + Binning + Datum, keine Teilenummer.",
+   "empfehlung": "Eigene Composite ohne fmtKundenText (Muster G)."
+  }
+ },
+ "produkte": [
+  {
+   "produkt": "AU010-01",
+   "ase": "A45A2182",
+   "quelle": "L1",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "AU010-02",
+   "ase": "A45A2186",
+   "quelle": "L1",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "AU095-03",
+   "ase": "A37A9476",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "AU095-04",
+   "ase": "A37A9481",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "AU126-00",
+   "ase": "A37A6153",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "AU261-05",
+   "ase": "A45A2206",
+   "quelle": "L1",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "AU337-01",
+   "ase": "A45A2190",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "AU337-02",
+   "ase": "A45A2194",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "AU350-03",
+   "ase": "A41A3064",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "AU350-04",
+   "ase": "A41A3100",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "AU383-21",
+   "ase": "A41A2292",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "AU383-22",
+   "ase": "A41A2328",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "AU495",
+   "ase": "A39A6561",
+   "quelle": "L2",
+   "l12_variable": "AU495_COMPOSITE",
+   "l12_inhalt": "AU495_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][Reserve3_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "AU501-20",
+   "ase": "A41A2460",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "AU580-00",
+   "ase": "A37A6151",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "AU583",
+   "ase": "A40A1610",
+   "quelle": "L2",
+   "l12_variable": "SET_COMPOSITE",
+   "l12_inhalt": "SET_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][Reserve3_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "AU849-21",
+   "ase": "A41A2386",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination ohne Binning_COMPOSITE",
+   "l12_inhalt": "HellaKombination ohne Binning_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER]",
+   "empfehlung": "PRÜFEN - kein Binning (Gruppe A)",
+   "gruppe": "A",
+   "referenz": ""
+  },
+  {
+   "produkt": "AU849-22",
+   "ase": "A41A2422",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination ohne Binning_COMPOSITE",
+   "l12_inhalt": "HellaKombination ohne Binning_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER]",
+   "empfehlung": "PRÜFEN - kein Binning (Gruppe A)",
+   "gruppe": "A",
+   "referenz": ""
+  },
+  {
+   "produkt": "AU882-01",
+   "ase": "A40A3708",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "AU882-02",
+   "ase": "A40A3744",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "AU923-00",
+   "ase": "A45A2210",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "AU971-01",
+   "ase": "A45A2198",
+   "quelle": "L1",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "AU971-02",
+   "ase": "A45A2202",
+   "quelle": "L1",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "BM054-11HA",
+   "ase": "A45A0475",
+   "quelle": "L2",
+   "l12_variable": "BM054Kombination_COMPOSITE",
+   "l12_inhalt": "BM054Kombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][BM054_FIELD][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "VW668-00 (getestet)"
+  },
+  {
+   "produkt": "BM054-12HA",
+   "ase": "A45A0476",
+   "quelle": "L2",
+   "l12_variable": "BM054Kombination_COMPOSITE",
+   "l12_inhalt": "BM054Kombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][BM054_FIELD][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "VW668-00 (getestet)"
+  },
+  {
+   "produkt": "BM054-21HA",
+   "ase": "A45A0419",
+   "quelle": "L2",
+   "l12_variable": "BM054Kombination_COMPOSITE",
+   "l12_inhalt": "BM054Kombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][BM054_FIELD][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "VW668-00 (getestet)"
+  },
+  {
+   "produkt": "BM054-22HA",
+   "ase": "A45A0420",
+   "quelle": "L2",
+   "l12_variable": "BM054Kombination_COMPOSITE",
+   "l12_inhalt": "BM054Kombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][BM054_FIELD][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "VW668-00 (getestet)"
+  },
+  {
+   "produkt": "BM054-41HA",
+   "ase": "A45A1401",
+   "quelle": "L2",
+   "l12_variable": "BM054Kombination_COMPOSITE",
+   "l12_inhalt": "BM054Kombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][BM054_FIELD][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "VW668-00 (getestet)"
+  },
+  {
+   "produkt": "BM054-42HA",
+   "ase": "A45A1402",
+   "quelle": "L2",
+   "l12_variable": "BM054Kombination_COMPOSITE",
+   "l12_inhalt": "BM054Kombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][BM054_FIELD][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "VW668-00 (getestet)"
+  },
+  {
+   "produkt": "BM054-43HA",
+   "ase": "A45A1403",
+   "quelle": "L2",
+   "l12_variable": "BM054Kombination_COMPOSITE",
+   "l12_inhalt": "BM054Kombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][BM054_FIELD][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "VW668-00 (getestet)"
+  },
+  {
+   "produkt": "BM054-44HA",
+   "ase": "A45A1404",
+   "quelle": "L1",
+   "l12_variable": "BM054Kombination_COMPOSITE",
+   "l12_inhalt": "BM054Kombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][BM054_FIELD][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "VW668-00 (getestet)"
+  },
+  {
+   "produkt": "BM080-01HA",
+   "ase": "A45A2374",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "BM080-05HA",
+   "ase": "A45A0425",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "BM080-06HA",
+   "ase": "A45A1405",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "BM253-01",
+   "ase": "A45A0483",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "BM253-02",
+   "ase": "A45A0484",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "BM378-02",
+   "ase": "A42A1498",
+   "quelle": "L2",
+   "l12_variable": "SET_COMPOSITE",
+   "l12_inhalt": "SET_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][Reserve3_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "BM378-03",
+   "ase": "A42A1499",
+   "quelle": "L2",
+   "l12_variable": "SET_COMPOSITE",
+   "l12_inhalt": "SET_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][Reserve3_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "BM378-04",
+   "ase": "A42A1500",
+   "quelle": "L2",
+   "l12_variable": "SET_COMPOSITE",
+   "l12_inhalt": "SET_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][Reserve3_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "BM378-05",
+   "ase": "A45A0500",
+   "quelle": "L2",
+   "l12_variable": "SET_COMPOSITE",
+   "l12_inhalt": "SET_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][Reserve3_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "BM378-06",
+   "ase": "A45A0506",
+   "quelle": "L2",
+   "l12_variable": "SET_COMPOSITE",
+   "l12_inhalt": "SET_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][Reserve3_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "BM378-07",
+   "ase": "A45A0516",
+   "quelle": "L2",
+   "l12_variable": "SET_COMPOSITE",
+   "l12_inhalt": "SET_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][Reserve3_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "BM378-08",
+   "ase": "A45A0522",
+   "quelle": "L2",
+   "l12_variable": "SET_COMPOSITE",
+   "l12_inhalt": "SET_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][Reserve3_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "BM378-09",
+   "ase": "A45A0527",
+   "quelle": "L2",
+   "l12_variable": "SET_COMPOSITE",
+   "l12_inhalt": "SET_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][Reserve3_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "BM378-10",
+   "ase": "A45A0530",
+   "quelle": "L2",
+   "l12_variable": "SET_COMPOSITE",
+   "l12_inhalt": "SET_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][Reserve3_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "BM378-11",
+   "ase": "A45A0003",
+   "quelle": "L2",
+   "l12_variable": "SET_COMPOSITE",
+   "l12_inhalt": "SET_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][Reserve3_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "BM378-13",
+   "ase": "A42A6503",
+   "quelle": "L2",
+   "l12_variable": "SET_COMPOSITE",
+   "l12_inhalt": "SET_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][Reserve3_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "BM491-01",
+   "ase": "A45A0933",
+   "quelle": "L2",
+   "l12_variable": "BM491-xx einzel_COMPOSITE",
+   "l12_inhalt": "BM491-xx einzel_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "BM491-02",
+   "ase": "A45A0934",
+   "quelle": "L2",
+   "l12_variable": "BM491-xx einzel_COMPOSITE",
+   "l12_inhalt": "BM491-xx einzel_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "BM572-01",
+   "ase": "A45A1557",
+   "quelle": "L2",
+   "l12_variable": "BM57x_COMPOSITE",
+   "l12_inhalt": "BM57x_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][BM57x Index AB_FIELD][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "BM572-02",
+   "ase": "A45A1563",
+   "quelle": "L1",
+   "l12_variable": "BM57x_COMPOSITE",
+   "l12_inhalt": "BM57x_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][Resvision 02=AB_FIELD][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "BM574-01",
+   "ase": "A45A1569",
+   "quelle": "L2",
+   "l12_variable": "BM57x_COMPOSITE",
+   "l12_inhalt": "BM57x_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][BM57x Index AB_FIELD][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "BM574-02",
+   "ase": "A45A1575",
+   "quelle": "L2",
+   "l12_variable": "BM57x_COMPOSITE",
+   "l12_inhalt": "BM57x_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][BM57x Index AB_FIELD][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "BM575-01",
+   "ase": "A45A1581",
+   "quelle": "L1",
+   "l12_variable": "BM57x_COMPOSITE",
+   "l12_inhalt": "BM57x_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][Resvision 02=AB_FIELD][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "BM575-02",
+   "ase": "A45A1587",
+   "quelle": "L1",
+   "l12_variable": "BM57x_COMPOSITE",
+   "l12_inhalt": "BM57x_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][Resvision 02=AB_FIELD][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "BM762-11",
+   "ase": "A40A7214",
+   "quelle": "L2",
+   "l12_variable": "BM762-768-10 Nutzendmc_COMPOSITE; BM762 - BM768-10_COMPOSITE",
+   "l12_inhalt": "BM762-768-10 Nutzendmc_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER][99_FIELD][OrderProduction-Date_CONVERTER] | BM762 - BM768-10_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CO",
+   "empfehlung": "PRÜFEN - festes 99 (Gruppe C)",
+   "gruppe": "C",
+   "referenz": ""
+  },
+  {
+   "produkt": "BM762-12",
+   "ase": "A40A7252",
+   "quelle": "L2",
+   "l12_variable": "BM762-768-10 Nutzendmc_COMPOSITE; BM762 - BM768-10_COMPOSITE",
+   "l12_inhalt": "BM762-768-10 Nutzendmc_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER][99_FIELD][OrderProduction-Date_CONVERTER] | BM762 - BM768-10_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CO",
+   "empfehlung": "PRÜFEN - festes 99 (Gruppe C)",
+   "gruppe": "C",
+   "referenz": ""
+  },
+  {
+   "produkt": "BM768-01",
+   "ase": "A40A7294",
+   "quelle": "L2",
+   "l12_variable": "BM762-768 Nutzendmc_COMPOSITE; BM768-00_COMPOSITE",
+   "l12_inhalt": "BM762-768 Nutzendmc_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER][OrderProduction-Date_CONVERTER] | BM768-00_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revis",
+   "empfehlung": "rawcode-single-WWYY",
+   "gruppe": null,
+   "referenz": "VW053-01 / FO165-00"
+  },
+  {
+   "produkt": "BM768-11",
+   "ase": "A40A7474",
+   "quelle": "L2",
+   "l12_variable": "BM762-768-10 Nutzendmc_COMPOSITE; BM762 - BM768-10_COMPOSITE",
+   "l12_inhalt": "BM762-768-10 Nutzendmc_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER][99_FIELD][OrderProduction-Date_CONVERTER] | BM762 - BM768-10_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CO",
+   "empfehlung": "PRÜFEN - festes 99 (Gruppe C)",
+   "gruppe": "C",
+   "referenz": ""
+  },
+  {
+   "produkt": "BM822-01",
+   "ase": "A42A1730",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE; HellaKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER] | HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CON",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "BM822-02",
+   "ase": "A42A1731",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE; HellaKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER] | HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CON",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "BM822-03",
+   "ase": "A42A1732",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE; HellaKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER] | HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CON",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "BM822-04",
+   "ase": "A42A1733",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE; HellaKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER] | HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CON",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "BM822-05",
+   "ase": "A42A1734",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE; HellaKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER] | HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CON",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "BM822-06",
+   "ase": "A42A1735",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE; HellaKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER] | HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CON",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "BM916-11",
+   "ase": "A40A7646",
+   "quelle": "L1",
+   "l12_variable": "BM916 SET Nutzendmc_COMPOSITE; BM916 SET (ohne BG 224.070-01-02)_COMPOSITE; BM916-01-02 SET BG 224.070-01-02_COMPOSITE",
+   "l12_inhalt": "BM916 SET Nutzendmc_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][Reserve3_CONVERTER][Reserve1_CONVERTER][OrderProduction-Date_CONVERTER] | BM916 SET (ohne BG 224.070-01-02)_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][Rese",
+   "empfehlung": "rawcode-single-WWYY + PRÜFEN Nutzendmc",
+   "gruppe": "D",
+   "referenz": "VW053-01 / FO165-00"
+  },
+  {
+   "produkt": "BM916-12",
+   "ase": "A40A7710",
+   "quelle": "L1",
+   "l12_variable": "BM916 SET Nutzendmc_COMPOSITE; BM916 SET (ohne BG 224.070-01-02)_COMPOSITE; BM916-01-02 SET BG 224.070-01-02_COMPOSITE",
+   "l12_inhalt": "BM916 SET Nutzendmc_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][Reserve3_CONVERTER][Reserve1_CONVERTER][OrderProduction-Date_CONVERTER] | BM916 SET (ohne BG 224.070-01-02)_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][Rese",
+   "empfehlung": "rawcode-single-WWYY + PRÜFEN Nutzendmc",
+   "gruppe": "D",
+   "referenz": "VW053-01 / FO165-00"
+  },
+  {
+   "produkt": "BM916-13",
+   "ase": "A40A7854",
+   "quelle": "L1",
+   "l12_variable": "BM916 SET Nutzendmc_COMPOSITE; BM916 SET (ohne BG 224.070-01-02)_COMPOSITE",
+   "l12_inhalt": "BM916 SET Nutzendmc_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][Reserve3_CONVERTER][Reserve1_CONVERTER][OrderProduction-Date_CONVERTER] | BM916 SET (ohne BG 224.070-01-02)_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][Rese",
+   "empfehlung": "rawcode-single-WWYY + PRÜFEN Nutzendmc",
+   "gruppe": "D",
+   "referenz": "VW053-01 / FO165-00"
+  },
+  {
+   "produkt": "BM916-14",
+   "ase": "A40A7926",
+   "quelle": "L1",
+   "l12_variable": "BM916 SET Nutzendmc_COMPOSITE; BM916 SET (ohne BG 224.070-01-02)_COMPOSITE",
+   "l12_inhalt": "BM916 SET Nutzendmc_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][Reserve3_CONVERTER][Reserve1_CONVERTER][OrderProduction-Date_CONVERTER] | BM916 SET (ohne BG 224.070-01-02)_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][Rese",
+   "empfehlung": "rawcode-single-WWYY + PRÜFEN Nutzendmc",
+   "gruppe": "D",
+   "referenz": "VW053-01 / FO165-00"
+  },
+  {
+   "produkt": "BMWF30SO",
+   "ase": "A39A3318",
+   "quelle": "L2",
+   "l12_variable": "BMW-F30-Kombination_COMPOSITE",
+   "l12_inhalt": "BMW-F30-Kombination_COMPOSITE = [OrderReserve1_CONVERTER][OrderC-Revision_CONVERTER][Reserve2_CONVERTER][Reserve3_CONVERTER][Reserve1_CONVERTER][OrderProduction-Date_CONVERTER][C-SerialNumber_CONVERTER]",
+   "empfehlung": "PRÜFEN - Reihenfolge (Gruppe B)",
+   "gruppe": "B",
+   "referenz": ""
+  },
+  {
+   "produkt": "DA239-00",
+   "ase": "A45A1339",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "DA255-00",
+   "ase": "A40A6524",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "DA360-01",
+   "ase": "A40A3360",
+   "quelle": "L2",
+   "l12_variable": "DA360-01_COMPOSITE",
+   "l12_inhalt": "DA360-01_COMPOSITE = [OrderReserve1_CONVERTER][OrderC-Revision_CONVERTER][C-SerialNumber_CONVERTER][Reserve1_CONVERTER][OrderProduction-Date_CONVERTER]",
+   "empfehlung": "PRÜFEN - Reihenfolge (Gruppe B)",
+   "gruppe": "B",
+   "referenz": ""
+  },
+  {
+   "produkt": "DA360-02",
+   "ase": "A40A3396",
+   "quelle": "L2",
+   "l12_variable": "DA360-02_COMPOSITE",
+   "l12_inhalt": "DA360-02_COMPOSITE = [OrderReserve1_CONVERTER][OrderC-Revision_CONVERTER][C-SerialNumber_CONVERTER][Reserve1_CONVERTER][OrderProduction-Date_CONVERTER]",
+   "empfehlung": "PRÜFEN - Reihenfolge (Gruppe B)",
+   "gruppe": "B",
+   "referenz": ""
+  },
+  {
+   "produkt": "DA362-01",
+   "ase": "A40A3434",
+   "quelle": "L2",
+   "l12_variable": "DA362-01_COMPOSITE",
+   "l12_inhalt": "DA362-01_COMPOSITE = [OrderReserve1_CONVERTER][OrderC-Revision_CONVERTER][C-SerialNumber_CONVERTER][Reserve1_CONVERTER][OrderProduction-Date_CONVERTER]",
+   "empfehlung": "PRÜFEN - Reihenfolge (Gruppe B)",
+   "gruppe": "B",
+   "referenz": ""
+  },
+  {
+   "produkt": "DA362-02",
+   "ase": "A40A3470",
+   "quelle": "L2",
+   "l12_variable": "DA362-02_COMPOSITE",
+   "l12_inhalt": "DA362-02_COMPOSITE = [OrderReserve1_CONVERTER][OrderC-Revision_CONVERTER][C-SerialNumber_CONVERTER][Reserve1_CONVERTER][OrderProduction-Date_CONVERTER]",
+   "empfehlung": "PRÜFEN - Reihenfolge (Gruppe B)",
+   "gruppe": "B",
+   "referenz": ""
+  },
+  {
+   "produkt": "DA364-01",
+   "ase": "A40A3266",
+   "quelle": "L1",
+   "l12_variable": "DA364-11_COMPOSITE",
+   "l12_inhalt": "DA364-11_COMPOSITE = [OrderReserve1_CONVERTER][OrderC-Revision_CONVERTER][C-SerialNumber_CONVERTER][OrderProduction-Date_CONVERTER]",
+   "empfehlung": "PRÜFEN - Reihenfolge (Gruppe B)",
+   "gruppe": "B",
+   "referenz": ""
+  },
+  {
+   "produkt": "DA364-02",
+   "ase": "A40A3302",
+   "quelle": "L1",
+   "l12_variable": "DA364-02_COMPOSITE",
+   "l12_inhalt": "DA364-02_COMPOSITE = [OrderReserve1_CONVERTER][OrderC-Revision_CONVERTER][C-SerialNumber_CONVERTER][OrderProduction-Date_CONVERTER]",
+   "empfehlung": "PRÜFEN - Reihenfolge (Gruppe B)",
+   "gruppe": "B",
+   "referenz": ""
+  },
+  {
+   "produkt": "DA364-11",
+   "ase": "A40A3338",
+   "quelle": "L1",
+   "l12_variable": "DA364-11_COMPOSITE",
+   "l12_inhalt": "DA364-11_COMPOSITE = [OrderReserve1_CONVERTER][OrderC-Revision_CONVERTER][C-SerialNumber_CONVERTER][OrderProduction-Date_CONVERTER]",
+   "empfehlung": "PRÜFEN - Reihenfolge (Gruppe B)",
+   "gruppe": "B",
+   "referenz": ""
+  },
+  {
+   "produkt": "DA364-12",
+   "ase": "A40A3348",
+   "quelle": "L1",
+   "l12_variable": "DA364-12_COMPOSITE",
+   "l12_inhalt": "DA364-12_COMPOSITE = [OrderReserve1_CONVERTER][OrderC-Revision_CONVERTER][C-SerialNumber_CONVERTER][OrderProduction-Date_CONVERTER]",
+   "empfehlung": "PRÜFEN - Reihenfolge (Gruppe B)",
+   "gruppe": "B",
+   "referenz": ""
+  },
+  {
+   "produkt": "DA429-03",
+   "ase": "A41A9044",
+   "quelle": "L2",
+   "l12_variable": "SET_COMPOSITE",
+   "l12_inhalt": "SET_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][Reserve3_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "DA429-04",
+   "ase": "A41A9073",
+   "quelle": "L2",
+   "l12_variable": "SET_COMPOSITE",
+   "l12_inhalt": "SET_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][Reserve3_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "DA435-00",
+   "ase": "A41A0920",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "DA802-01",
+   "ase": "A40A3000",
+   "quelle": "L1",
+   "l12_variable": "DA802 NutzenDMC Kombination_COMPOSITE; DA802 SET Kombination_COMPOSITE",
+   "l12_inhalt": "DA802 NutzenDMC Kombination_COMPOSITE = [Reserve2_CONVERTER][Reserve3_CONVERTER][LeerschlagVariable_FIELD][LeerschlagVariable_FIELD][C-SerialNumber_CONVERTER][Reserve1_CONVERTER][OrderProduction-Date_CONVERTER] | DA802 SET Kombination_COMPOSITE = [Re",
+   "empfehlung": "PRÜFEN - Leerschlag (Gruppe E)",
+   "gruppe": "E",
+   "referenz": ""
+  },
+  {
+   "produkt": "DA802-02",
+   "ase": "A40A3042",
+   "quelle": "L1",
+   "l12_variable": "DA802 NutzenDMC Kombination_COMPOSITE; DA802 SET Kombination_COMPOSITE",
+   "l12_inhalt": "DA802 NutzenDMC Kombination_COMPOSITE = [Reserve2_CONVERTER][Reserve3_CONVERTER][LeerschlagVariable_FIELD][LeerschlagVariable_FIELD][C-SerialNumber_CONVERTER][Reserve1_CONVERTER][OrderProduction-Date_CONVERTER] | DA802 SET Kombination_COMPOSITE = [Re",
+   "empfehlung": "PRÜFEN - Leerschlag (Gruppe E)",
+   "gruppe": "E",
+   "referenz": ""
+  },
+  {
+   "produkt": "DA802-03",
+   "ase": "A40A3144",
+   "quelle": "L1",
+   "l12_variable": "DA802 NutzenDMC Kombination_COMPOSITE; DA802 SET Kombination_COMPOSITE",
+   "l12_inhalt": "DA802 NutzenDMC Kombination_COMPOSITE = [Reserve2_CONVERTER][Reserve3_CONVERTER][LeerschlagVariable_FIELD][LeerschlagVariable_FIELD][C-SerialNumber_CONVERTER][Reserve1_CONVERTER][OrderProduction-Date_CONVERTER] | DA802 SET Kombination_COMPOSITE = [Re",
+   "empfehlung": "PRÜFEN - Leerschlag (Gruppe E)",
+   "gruppe": "E",
+   "referenz": ""
+  },
+  {
+   "produkt": "DA802-04",
+   "ase": "A40A3186",
+   "quelle": "L1",
+   "l12_variable": "DA802 NutzenDMC Kombination_COMPOSITE; DA802 SET Kombination_COMPOSITE",
+   "l12_inhalt": "DA802 NutzenDMC Kombination_COMPOSITE = [Reserve2_CONVERTER][Reserve3_CONVERTER][LeerschlagVariable_FIELD][LeerschlagVariable_FIELD][C-SerialNumber_CONVERTER][Reserve1_CONVERTER][OrderProduction-Date_CONVERTER] | DA802 SET Kombination_COMPOSITE = [Re",
+   "empfehlung": "PRÜFEN - Leerschlag (Gruppe E)",
+   "gruppe": "E",
+   "referenz": ""
+  },
+  {
+   "produkt": "DA835-01",
+   "ase": "A41A9860",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "DA835-02",
+   "ase": "A41A9861",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "DA835-03",
+   "ase": "A41A9862",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "DA835-04",
+   "ase": "A41A9863",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "DA836-01",
+   "ase": "A41A9864",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "DA836-02",
+   "ase": "A41A9865",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "DA836-03",
+   "ase": "A41A9866",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "DA836-04",
+   "ase": "A41A9867",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "DA858-00",
+   "ase": "A40A6452",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "DA860-00",
+   "ase": "A40A6338",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "DA862-00",
+   "ase": "A40A6488",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "FO165-00",
+   "ase": "A41A9590",
+   "quelle": "L2",
+   "l12_variable": "FO165-00 SET_COMPOSITE",
+   "l12_inhalt": "FO165-00 SET_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][Reserve3_CONVERTER][Reserve1_CONVERTER][OrderProduction-Date_CONVERTER]",
+   "empfehlung": "rawcode-single-WWYY",
+   "gruppe": null,
+   "referenz": "VW053-01 / FO165-00"
+  },
+  {
+   "produkt": "GM095-00",
+   "ase": "A45A1466",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "GM095-10",
+   "ase": "A45A1468",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "GM184-00",
+   "ase": "A42A3835",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "GM185-00",
+   "ase": "A42A3836",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "GM186-00",
+   "ase": "A42A3674",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "GM255-00",
+   "ase": "A45A1791",
+   "quelle": "L2",
+   "l12_variable": "BM054Kombination_COMPOSITE",
+   "l12_inhalt": "BM054Kombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][BM054_FIELD][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "VW668-00 (getestet)"
+  },
+  {
+   "produkt": "GM511-01",
+   "ase": "A45A1789",
+   "quelle": "L2",
+   "l12_variable": "BM054Kombination_COMPOSITE",
+   "l12_inhalt": "BM054Kombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][BM054_FIELD][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "VW668-00 (getestet)"
+  },
+  {
+   "produkt": "GM839-00",
+   "ase": "A40A8366",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "GO582-0B",
+   "ase": "A39A8802",
+   "quelle": "L2",
+   "l12_variable": "MAGOTAN-DMC_COMPOSITE",
+   "l12_inhalt": "MAGOTAN-DMC_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][Reserve3_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "L53HFOGL",
+   "ase": "A36A2457",
+   "quelle": "L1",
+   "l12_variable": "L53HFOGL_COMPOSITE",
+   "l12_inhalt": "L53HFOGL_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER]",
+   "empfehlung": "PRÜFEN - kein Binning (Gruppe A)",
+   "gruppe": "A",
+   "referenz": ""
+  },
+  {
+   "produkt": "L53HLEDL",
+   "ase": "A36A4970",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE; MacanKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER] | MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CON",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "L53HLEDR",
+   "ase": "A36A4992",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE; MacanKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER] | MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CON",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "MC System 360-01",
+   "ase": "A38A6040",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "MC System 360-01",
+   "ase": "A36A8636",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "MC System 360-02",
+   "ase": "A38A6041",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "MC System 360-02",
+   "ase": "A36A8667",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "MC System 360-03",
+   "ase": "A38A6042",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "MC System 360-03",
+   "ase": "A36A9335",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "MC System 360-04",
+   "ase": "A38A6043",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "MC System 360-04",
+   "ase": "A36A9342",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "MC System 361-01",
+   "ase": "A36A8822",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "MC System 361-01",
+   "ase": "A38A6044",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "MC System 361-02",
+   "ase": "A36A8853",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "MC System 361-02",
+   "ase": "A38A6045",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "MC System 361-03",
+   "ase": "A36A8884",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "MC System 361-03",
+   "ase": "A38A6046",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "MC System 361-04",
+   "ase": "A36A8891",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "MC System 361-04",
+   "ase": "A38A6047",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "MC480-01",
+   "ase": "A36A8698",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "MC480-02",
+   "ase": "A36A8729",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "MC480-03",
+   "ase": "A36A9517",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "MC480-04",
+   "ase": "A36A9526",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "MC482-01",
+   "ase": "A36A8760",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "MC482-02",
+   "ase": "A36A8791",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "MC488-01",
+   "ase": "A36A8960",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "MC488-02",
+   "ase": "A36A8991",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "MC488-03",
+   "ase": "A36A9606",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "MC488-04",
+   "ase": "A36A9615",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "MC491-01",
+   "ase": "A36A9022",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "MC491-02",
+   "ase": "A36A9053",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "MC766-21",
+   "ase": "A41A6102",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "MC766-22",
+   "ase": "A41A6138",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "MC766-23",
+   "ase": "A41A6174",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "MC766-24",
+   "ase": "A41A6184",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "MC766-25",
+   "ase": "A41A6194",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "MC766-26",
+   "ase": "A41A6204",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "MONOLEDH",
+   "ase": "A39A1573",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "NCV3-PO",
+   "ase": "A36A6436",
+   "quelle": "L1",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "NCV3SMLR",
+   "ase": "A36A6405",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "NI324-03",
+   "ase": "A41A4418",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "NI324-04",
+   "ase": "A41A4454",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "NI525-00",
+   "ase": "A40A4142",
+   "quelle": "L2",
+   "l12_variable": "NI525 Nutzenrand_COMPOSITE; SET_COMPOSITE",
+   "l12_inhalt": "NI525 Nutzenrand_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER] | SET_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][Reserve3_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "NI568-10",
+   "ase": "A40A4106",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination ohne Binning_COMPOSITE",
+   "l12_inhalt": "HellaKombination ohne Binning_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER]",
+   "empfehlung": "PRÜFEN - kein Binning (Gruppe A)",
+   "gruppe": "A",
+   "referenz": ""
+  },
+  {
+   "produkt": "NI855-00",
+   "ase": "A40A4066",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "OMEGA-CL2",
+   "ase": "A38A8581",
+   "quelle": "L1",
+   "l12_variable": "MacanKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "PANA-TFL",
+   "ase": "A35A9240",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "PANVLEDL",
+   "ase": "A36A2030",
+   "quelle": "L1",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "PANVLEDR",
+   "ase": "A36A2165",
+   "quelle": "L1",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "PD584-10",
+   "ase": "A40A6016",
+   "quelle": "L2",
+   "l12_variable": "PD584_COMPOSITE",
+   "l12_inhalt": "PD584_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][Reserve3_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "PDLS-283",
+   "ase": "A42A4679",
+   "quelle": "L2",
+   "l12_variable": "PDLS-SET-DMC_COMPOSITE",
+   "l12_inhalt": "PDLS-SET-DMC_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][Reserve3_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "PDLS-284",
+   "ase": "A42A4683",
+   "quelle": "L2",
+   "l12_variable": "PDLS-SET-DMC_COMPOSITE",
+   "l12_inhalt": "PDLS-SET-DMC_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][Reserve3_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "PDLS-583",
+   "ase": "A39A9934",
+   "quelle": "L2",
+   "l12_variable": "PDLS-SET-DMC_COMPOSITE",
+   "l12_inhalt": "PDLS-SET-DMC_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][Reserve3_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "PDLS5831",
+   "ase": "A40A5938",
+   "quelle": "L2",
+   "l12_variable": "PDLS-SET-DMC_COMPOSITE",
+   "l12_inhalt": "PDLS-SET-DMC_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][Reserve3_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "PDLS5832",
+   "ase": "A40A5978",
+   "quelle": "L2",
+   "l12_variable": "PDLS-SET-DMC_COMPOSITE",
+   "l12_inhalt": "PDLS-SET-DMC_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][Reserve3_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "PDLS-584",
+   "ase": "A40A0000",
+   "quelle": "L2",
+   "l12_variable": "PDLS-SET-DMC_COMPOSITE",
+   "l12_inhalt": "PDLS-SET-DMC_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][Reserve3_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "PDLS5841",
+   "ase": "A39A9862",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "PDLS5842",
+   "ase": "A39A9898",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "PDLS9631",
+   "ase": "A40A0052",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "PDLS9632",
+   "ase": "A40A0088",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "PO231-00",
+   "ase": "A45A1813",
+   "quelle": "L1",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "PO231-10",
+   "ase": "A45A1815",
+   "quelle": "L1",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "PO232-00",
+   "ase": "A45A1817",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "PO336-01",
+   "ase": "A45A1793",
+   "quelle": "L1",
+   "l12_variable": "HellaKombination_COMPOSITE; SET_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER] | SET_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][Reserve3_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "PO336-02",
+   "ase": "A45A1798",
+   "quelle": "L1",
+   "l12_variable": "HellaKombination_COMPOSITE; SET_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER] | SET_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][Reserve3_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "PO613-00\nSystem PO681-00",
+   "ase": "A45A1265",
+   "quelle": "L2",
+   "l12_variable": "PO613_COMPOSITE",
+   "l12_inhalt": "PO613_COMPOSITE = [PO613 6 - Digit_FIELD][C-SerialNumber_CONVERTER][PO613-615 Index AA_FIELD][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "PO615-00\nSystem PO 681-00",
+   "ase": "A45A1267",
+   "quelle": "L2",
+   "l12_variable": "PO615_COMPOSITE",
+   "l12_inhalt": "PO615_COMPOSITE = [PO615 6 - Digit_FIELD][C-SerialNumber_CONVERTER][PO613-615 Index AA_FIELD][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "PO618-00",
+   "ase": "A45A1269",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "PO619-00",
+   "ase": "A45A1271",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "PO621-00",
+   "ase": "A45A1273",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "PO623-01",
+   "ase": "A45A1275",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "PO623-02",
+   "ase": "A45A1277",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "PO625-00",
+   "ase": "A45A1279",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "PO690-00",
+   "ase": "A45A1819",
+   "quelle": "L1",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "RE457-01",
+   "ase": "A41A3170",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "RE457-02",
+   "ase": "A41A3210",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "SK-10LES",
+   "ase": "A39A4196",
+   "quelle": "L2",
+   "l12_variable": "MacanKombination_COMPOSITE; HellaKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER] | HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CON",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "SKAFSES",
+   "ase": "A39A4160",
+   "quelle": "L2",
+   "l12_variable": "MacanKombination_COMPOSITE; HellaKombination_COMPOSITE",
+   "l12_inhalt": "MacanKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER] | HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CON",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "TO790-01",
+   "ase": "A41A4650",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "TO790-02",
+   "ase": "A41A4665",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "TU249-00",
+   "ase": "A42A4837",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "TU250-00",
+   "ase": "A42A4839",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "TU801-00",
+   "ase": "A40A2456",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "TU803-00",
+   "ase": "A40A2417",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "VL2-634",
+   "ase": "A38A9452",
+   "quelle": "L2",
+   "l12_variable": "MAGOTAN-DMC_COMPOSITE",
+   "l12_inhalt": "MAGOTAN-DMC_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][Reserve3_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "VL2-6341",
+   "ase": "A39A9105",
+   "quelle": "L2",
+   "l12_variable": "MAGOTAN-DMC_COMPOSITE",
+   "l12_inhalt": "MAGOTAN-DMC_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][Reserve3_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "VO007-00",
+   "ase": "A41A8275",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "VO118-00",
+   "ase": "A41A8188",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "VO121-00",
+   "ase": "A41A8198",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "VO614-00",
+   "ase": "A41A8266",
+   "quelle": "L2",
+   "l12_variable": "SET_COMPOSITE",
+   "l12_inhalt": "SET_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][Reserve3_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "VO615-00",
+   "ase": "A41A8257",
+   "quelle": "L2",
+   "l12_variable": "SET_COMPOSITE",
+   "l12_inhalt": "SET_COMPOSITE = [Reserve2_CONVERTER][C-SerialNumber_CONVERTER][Reserve3_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "VO710-00",
+   "ase": "A41A8208",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "VW053-01",
+   "ase": "A45A0971",
+   "quelle": "L2",
+   "l12_variable": "VW053-01_COMPOSITE",
+   "l12_inhalt": "VW053-01_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER][WWYY_DATE]",
+   "empfehlung": "rawcode-single-WWYY",
+   "gruppe": null,
+   "referenz": "VW053-01 / FO165-00"
+  },
+  {
+   "produkt": "VW053-02",
+   "ase": "A45A0973",
+   "quelle": "L2",
+   "l12_variable": "VW053-01_COMPOSITE",
+   "l12_inhalt": "VW053-01_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER][WWYY_DATE]",
+   "empfehlung": "rawcode-single-WWYY",
+   "gruppe": null,
+   "referenz": "VW053-01 / FO165-00"
+  },
+  {
+   "produkt": "VW055-00",
+   "ase": "A45A1366",
+   "quelle": "L2",
+   "l12_variable": "VW055_COMPOSITE",
+   "l12_inhalt": "VW055_COMPOSITE = [C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER][WWYY_DATE]",
+   "empfehlung": "PRÜFEN - ohne part (Gruppe F)",
+   "gruppe": "F",
+   "referenz": ""
+  },
+  {
+   "produkt": "VW057-00",
+   "ase": "A45A0967",
+   "quelle": "L2",
+   "l12_variable": "VW053-01_COMPOSITE",
+   "l12_inhalt": "VW053-01_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER][WWYY_DATE]",
+   "empfehlung": "rawcode-single-WWYY",
+   "gruppe": null,
+   "referenz": "VW053-01 / FO165-00"
+  },
+  {
+   "produkt": "VW394-00",
+   "ase": "A45A0969",
+   "quelle": "L2",
+   "l12_variable": "VW053-01_COMPOSITE",
+   "l12_inhalt": "VW053-01_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER][WWYY_DATE]",
+   "empfehlung": "rawcode-single-WWYY",
+   "gruppe": null,
+   "referenz": "VW053-01 / FO165-00"
+  },
+  {
+   "produkt": "VW668-00",
+   "ase": "A45A0910",
+   "quelle": "L2",
+   "l12_variable": "BM054Kombination_COMPOSITE",
+   "l12_inhalt": "BM054Kombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][BM054_FIELD][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "VW668-00 (getestet)"
+  },
+  {
+   "produkt": "VW672-00",
+   "ase": "A45A0912",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "VW672-01",
+   "ase": "A45A0914",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "VW926-00",
+   "ase": "A45A1368",
+   "quelle": "L2",
+   "l12_variable": "VW053-01_COMPOSITE",
+   "l12_inhalt": "VW053-01_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER][WWYY_DATE]",
+   "empfehlung": "rawcode-single-WWYY",
+   "gruppe": null,
+   "referenz": "VW053-01 / FO165-00"
+  },
+  {
+   "produkt": "VW986-00",
+   "ase": "A41A2880",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "VW989-00",
+   "ase": "A41A2916",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "W213S1EL",
+   "ase": "A39A5581",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "W213S1ER",
+   "ase": "A39A5600",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "W213S1HB",
+   "ase": "A38A2297",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "W213S1SL",
+   "ase": "A39A5590",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  },
+  {
+   "produkt": "W213S1SR",
+   "ase": "A39A5610",
+   "quelle": "L2",
+   "l12_variable": "HellaKombination_COMPOSITE",
+   "l12_inhalt": "HellaKombination_COMPOSITE = [OrderReserve1_CONVERTER][C-SerialNumber_CONVERTER][OrderC-Revision_CONVERTER][Reserve1_CONVERTER]",
+   "empfehlung": "rawcode-single",
+   "gruppe": null,
+   "referenz": "BM253-01 / MC System 360-01 / DA255-00 / PDLS5841 / NCV3SMLR"
+  }
+ ]
+}
