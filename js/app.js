@@ -311,10 +311,33 @@ async function loadProdukte() {
 }
 
 /**
+ * Laedt die Warnungen des Batch-Konverters (warnungen.json).
+ * Diese Datei erzeugt der Konverter automatisch. Sie enthaelt
+ * Plausibilitaetswarnungen (z.B. unlogische Reihenfolge oder
+ * Koordinaten ausserhalb der Platine). Die Web-App zeigt sie ROT.
+ * Neu: 20.08.2026, Wunsch von Mohamad.
+ * @returns {Object} Map: Produktbezeichnung -> { ase_nr, meldungen }
+ */
+async function ladeWarnungen() {
+    // Nur einmal pro Seitenaufruf laden
+    if (window.produktWarnungen !== undefined) return window.produktWarnungen;
+    try {
+        const antwort = await fetch('warnungen.json');
+        if (!antwort.ok) throw new Error('HTTP ' + antwort.status);
+        const daten = await antwort.json();
+        window.produktWarnungen = daten.produkte || {};
+    } catch (err) {
+        console.warn('warnungen.json nicht ladbar:', err.message);
+        window.produktWarnungen = {};
+    }
+    return window.produktWarnungen;
+}
+
+/**
  * Rendert die Produkt-Tabelle.
  * @param {Array} produkte - Array von Produkt-Objekten
  */
-function renderProdukteTabelle(produkte) {
+async function renderProdukteTabelle(produkte) {
     const tbody = document.getElementById('produkte-table-body');
 
     if (!produkte || produkte.length === 0) {
@@ -323,13 +346,24 @@ function renderProdukteTabelle(produkte) {
         return;
     }
 
+    // Konverter-Warnungen laden (fuer die roten Badges)
+    const warnungen = await ladeWarnungen();
+
     // HTML fuer jede Zeile generieren.
     // WICHTIG: Alle Datenbank-Werte werden durch escapeHtml() gesichert,
     //          damit kein boeser Code (XSS) ausgefuehrt werden kann.
-    tbody.innerHTML = produkte.map(p => `
-        <tr class="clickable produkte-row"
+    tbody.innerHTML = produkte.map(p => {
+        // Rotes Warnungs-Badge, wenn der Konverter etwas gefunden hat
+        const hatWarnung = warnungen && warnungen[p.bezeichnung];
+        const warnungBadge = hatWarnung
+            ? ' <span class="badge badge-warnung" title="' +
+              escapeHtml(warnungen[p.bezeichnung].meldungen.join(' | ')) +
+              '">WARNUNG</span>'
+            : '';
+        return `
+        <tr class="clickable produkte-row${hatWarnung ? ' row-warnung' : ''}"
             data-produkt-id="${escapeHtml(p.id)}">
-            <td><strong>${escapeHtml(p.bezeichnung)}</strong></td>
+            <td><strong>${escapeHtml(p.bezeichnung)}</strong>${warnungBadge}</td>
             <td class="mono">${escapeHtml(p.ase_materialnr) || '-'}</td>
             <td>${escapeHtml(p.material) || '-'}</td>
             <td class="numeric">
@@ -344,8 +378,8 @@ function renderProdukteTabelle(produkte) {
                 <span class="${getStatusBadgeClass(p.status)}">${escapeHtml(p.status)}</span>
             </td>
             <td>${formatDate(p.erstellt_am)}</td>
-        </tr>
-    `).join('');
+        </tr>`;
+    }).join('');
 
     // Event-Listener statt onclick (XSS-Sicherheit nach MiniMax-Review K4).
     tbody.querySelectorAll('.produkte-row').forEach(row => {
@@ -508,6 +542,31 @@ async function loadDetail() {
         showMessage('Produkt nicht gefunden: ' +
             (errProdukt ? errProdukt.message : 'unbekannter Fehler'), 'error');
         return;
+    }
+
+    // 1b. Konverter-Warnungen anzeigen (rot, Neu 20.08.2026)
+    // Der Batch-Konverter prueft Koordinaten und Reihenfolge auf
+    // Plausibilitaet. Funde erscheinen hier als roter Block.
+    try {
+        const warnungen = await ladeWarnungen();
+        const eintrag = warnungen && warnungen[produkt.bezeichnung];
+        const container = document.getElementById('warnungen-container');
+        if (eintrag && container) {
+            const punkte = eintrag.meldungen
+                .map(m => '<li>' + escapeHtml(m) + '</li>').join('');
+            container.innerHTML =
+                '<div class="warnung-block">' +
+                '<div class="warnung-titel">WARNUNG - bitte am Laser pruefen ' +
+                '(automatische Koordinatenpruefung vom ' +
+                escapeHtml(eintrag.stand || '') + ')</div>' +
+                '<ul>' + punkte + '</ul>' +
+                '<div class="warnung-hinweis">Die Daten wurden EXAKT aus ' +
+                'der Quelle uebernommen und nicht veraendert.</div>' +
+                '</div>';
+            container.style.display = 'block';
+        }
+    } catch (err) {
+        console.warn('Warnungen nicht anzeigbar:', err.message);
     }
 
     // 2. Programme laden (alle Varianten)
