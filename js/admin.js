@@ -528,7 +528,21 @@ async function ladeVerwaltung() {
         .order('bezeichnung', { ascending: true });
 
     if (error) {
-        showMessage('Fehler beim Laden: ' + error.message, 'error');
+        // Verstaendlicher Hinweis, wenn die DB-Migration noch fehlt
+        // (PGRST204 = angeforderte Spalte existiert nicht)
+        if ((error.code === 'PGRST204') ||
+            (error.message || '').includes('Could not find the column') ||
+            (error.message || '').includes('does not exist')) {
+            showMessage(
+                'Die Datenbank-Erweiterung ist noch nicht eingespielt. ' +
+                'Bitte im Supabase SQL-Editor das Skript ' +
+                'sql/13_admin_bearbeitung.sql ausfuehren (3 Klicks, ' +
+                'Anleitung im Projektgedaechtnis). Danach diese Seite neu laden.',
+                'error'
+            );
+        } else {
+            showMessage('Fehler beim Laden: ' + error.message, 'error');
+        }
         return;
     }
 
