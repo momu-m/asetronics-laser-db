@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://dpxcrhywvblsbilyeiaw.supabase.co;">
+    <title>Verwaltung - ALPA</title>
+
+    <!-- Dunkles Layout sofort setzen, bevor die Seite sichtbar wird
+         (verhindert weissen Blitz). Die Auswahl kommt aus theme.js. -->
+    <script>
+        try {
+            if (localStorage.getItem('alpa-theme') === 'dark') {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        } catch (e) {}
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#003366">
+</head>
+<body data-page="verwaltung">
+
+    <!-- =================================================================
+         HEADER (gleicher Aufbau wie anfragen.html)
+         ================================================================= -->
+    <header class="app-header">
+        <div class="app-header-inner">
+            <a href="produkte.html" class="app-header-brand">
+                <img src="assets/asetronics-logo.png" alt="Asetronics AG" class="app-header-logo">
+                <div class="app-header-title">ALPA <small>Laser-Programm-Archiv</small></div>
+            </a>
+            <div class="app-header-user">
+                <span>Angemeldet: <strong class="user-label" id="user-email">-</strong></span>
+                <span id="admin-badge-header" class="admin-badge" style="display:none;">ADMIN</span>
+                <a href="produkte.html" class="btn btn-secondary btn-sm">Produkte</a>
+                <a href="variablen.html" class="btn btn-secondary btn-sm">Variablen</a>
+                <a href="rechner.html" class="btn btn-secondary btn-sm">Rechner</a>
+                <a href="qualifikation.html" class="btn btn-secondary btn-sm">Qualifikation</a>
+                <a href="anfragen.html" class="btn btn-secondary btn-sm" id="anfragen-link" style="display:none;">
+                    Anfragen <span id="anfragen-count-badge" class="anfragen-count-badge" style="display:none;">0</span>
+                </a>
+                <button class="btn btn-secondary btn-sm theme-toggle" onclick="toggleTheme()">Dunkel</button>
+                <button class="btn btn-secondary btn-sm" onclick="logout()">Abmelden</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- =================================================================
+         MAIN: Verwaltung (Archiv, Papierkorb, Audit-Log) - nur Admin
+         ================================================================= -->
+    <main class="app-container">
+
+            <!-- Breadcrumb -->
+            <div class="breadcrumb">
+                <a href="produkte.html">Produkte</a>
+                <span class="breadcrumb-sep">&rsaquo;</span>
+                <span>Verwaltung</span>
+            </div>
+
+            <h1 class="page-title">Verwaltung</h1>
+            <p class="page-subtitle">
+                Archiv, Papierkorb und Aenderungsprotokoll. Nichts verschwindet spurlos:
+                Archivierte bleiben ueber den Filter sichtbar, Geloeschte liegen im
+                Papierkorb und koennen wiederhergestellt werden.
+            </p>
+
+            <!-- Meldungsbereich -->
+            <div id="message" style="display: none;"></div>
+
+            <!-- Kein Admin Hinweis (wird nur gezeigt wenn kein Admin) -->
+            <div id="no-admin-hint" class="alert alert-error" style="display:none; margin-bottom: 24px;">
+                Du hast keine Admin-Rechte. Nur Admins sehen Archiv, Papierkorb
+                und Aenderungsprotokoll.
+            </div>
+
+            <!-- ============================================================
+                 1. Archiv (erledigte Produkte)
+                 ============================================================ -->
+            <section id="section-archiv" class="admin-section" style="margin-bottom: 32px;">
+                <h2 class="admin-section-title">
+                    Archiv
+                    <span id="archiv-count" class="badge badge-konvertiert">0</span>
+                </h2>
+                <p class="admin-section-sub">
+                    Erledigte Produkte. In der Programm-Liste erscheinen sie nur mit
+                    aktivem Filter &laquo;Archiv anzeigen&raquo;. Der alte Status bleibt erhalten.
+                </p>
+
+                <div id="archiv-liste">
+                    <div class="empty-state">Lade Archiv...</div>
+                </div>
+            </section>
+
+            <!-- ============================================================
+                 2. Geloescht (Papierkorb mit Wiederherstellen)
+                 ============================================================ -->
+            <section id="section-geloescht" class="admin-section" style="margin-bottom: 32px;">
+                <h2 class="admin-section-title">
+                    Gel&ouml;scht (Papierkorb)
+                    <span id="geloescht-count" class="badge badge-gesperrt">0</span>
+                </h2>
+                <p class="admin-section-sub">
+                    Diese Produkte wurden gel&ouml;scht (Soft-Delete). Sie sind nur hier
+                    sichtbar und koennen jederzeit wiederhergestellt werden.
+                    Programme und Dateien bleiben erhalten.
+                </p>
+
+                <div id="geloescht-liste">
+                    <div class="empty-state">Lade Papierkorb...</div>
+                </div>
+            </section>
+
+            <!-- ============================================================
+                 3. Audit-Log (globales Aenderungsprotokoll)
+                 ============================================================ -->
+            <section id="section-audit" class="admin-section">
+                <h2 class="admin-section-title">
+                    &Auml;nderungsprotokoll (Audit-Log)
+                    <span id="audit-count" class="badge badge-freigegeben">0</span>
+                </h2>
+                <p class="admin-section-sub">
+                    Jede &Auml;nderung aus der Web-App (und sogar direkte SQL-&Auml;nderungen)
+                    wird automatisch protokolliert: wer, wann, was, alt &rarr; neu.
+                    Angezeigt werden die neuesten 100 Eintr&auml;ge.
+                </p>
+
+                <div class="table-card">
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Zeitpunkt</th>
+                                    <th>Benutzer</th>
+                                    <th>Aktion</th>
+                                    <th>Feld</th>
+                                    <th>Produkt</th>
+                                    <th>&Auml;nderung (alt &rarr; neu)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="audit-table-body">
+                                <tr><td colspan="6" class="loading-state">Lade Protokoll...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+    </main>
+
+    <footer class="app-footer">
+        ALPA v1.0 &middot; Asetronics AG Bern &middot; SMT-Produktion
+    </footer>
+
+    <!-- =================================================================
+         JAVASCRIPT
+         ================================================================= -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="config.js"></script>
+    <script src="js/app.js"></script>
+    <script src="js/admin.js"></script>
+    <script src="js/theme.js"></script>
+
+    <script src="js/pwa.js"></script>
+</body>
+</html>
