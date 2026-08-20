@@ -1,62 +1,62 @@
 {
   "stand": "2026-08-20",
-  "beschreibung": "Automatische Plausibilitaetswarnungen des Batch-Konverters v2. Produkte mit Eintraegen zeigen die Web-App rot an. Die konvertierten Daten wurden EXAKT aus der Quelle uebernommen - die Warnungen sind Hinweise zum Pruefen, keine automatischen Korrekturen.",
+  "beschreibung": "Automatische Plausibilitaetswarnungen des Batch-Konverters v2",
   "produkte": {
-    "MC491-01": {
-      "ase_nr": "A36A9022",
-      "typ": "reihenfolge",
-      "stand": "2026-08-20",
-      "meldungen": [
-        "REIHENFOLGE: Die Quell-Reihenfolge wirkt unlogisch (Zickzack). Eine X-then-Y-Sortierung waere um 43% kuerzer. Die Reihenfolge wurde EXAKT aus der Quelle uebernommen und NICHT geaendert - am Laser pruefen, ob die alte Reihenfolge wirklich gewollt ist."
-      ]
-    },
-    "MC491-02": {
-      "ase_nr": "A36A9053",
-      "typ": "reihenfolge",
-      "stand": "2026-08-20",
-      "meldungen": [
-        "REIHENFOLGE: Die Quell-Reihenfolge wirkt unlogisch (Zickzack). Eine X-then-Y-Sortierung waere um 43% kuerzer. Die Reihenfolge wurde EXAKT aus der Quelle uebernommen und NICHT geaendert - am Laser pruefen, ob die alte Reihenfolge wirklich gewollt ist."
-      ]
-    },
     "MC System 361-01 (MC486)": {
       "ase_nr": "A38A6044",
       "typ": "reihenfolge",
-      "stand": "2026-08-20",
       "meldungen": [
         "REIHENFOLGE: Die Quell-Reihenfolge wirkt unlogisch (Zickzack). Eine X-then-Y-Sortierung waere um 44% kuerzer. Die Reihenfolge wurde EXAKT aus der Quelle uebernommen und NICHT geaendert - am Laser pruefen, ob die alte Reihenfolge wirklich gewollt ist."
-      ]
+      ],
+      "stand": "2026-08-20"
     },
     "MC System 361-02 (MC486)": {
       "ase_nr": "A38A6045",
       "typ": "reihenfolge",
-      "stand": "2026-08-20",
       "meldungen": [
         "REIHENFOLGE: Die Quell-Reihenfolge wirkt unlogisch (Zickzack). Eine X-then-Y-Sortierung waere um 44% kuerzer. Die Reihenfolge wurde EXAKT aus der Quelle uebernommen und NICHT geaendert - am Laser pruefen, ob die alte Reihenfolge wirklich gewollt ist."
-      ]
+      ],
+      "stand": "2026-08-20"
     },
     "MC System 361-03 (MC486)": {
       "ase_nr": "A38A6046",
       "typ": "reihenfolge",
-      "stand": "2026-08-20",
       "meldungen": [
         "REIHENFOLGE: Die Quell-Reihenfolge wirkt unlogisch (Zickzack). Eine X-then-Y-Sortierung waere um 44% kuerzer. Die Reihenfolge wurde EXAKT aus der Quelle uebernommen und NICHT geaendert - am Laser pruefen, ob die alte Reihenfolge wirklich gewollt ist."
-      ]
+      ],
+      "stand": "2026-08-20"
     },
     "MC System 361-04 (MC486)": {
       "ase_nr": "A38A6047",
       "typ": "reihenfolge",
-      "stand": "2026-08-20",
       "meldungen": [
         "REIHENFOLGE: Die Quell-Reihenfolge wirkt unlogisch (Zickzack). Eine X-then-Y-Sortierung waere um 44% kuerzer. Die Reihenfolge wurde EXAKT aus der Quelle uebernommen und NICHT geaendert - am Laser pruefen, ob die alte Reihenfolge wirklich gewollt ist."
-      ]
+      ],
+      "stand": "2026-08-20"
+    },
+    "MC491-01": {
+      "ase_nr": "A36A9022",
+      "typ": "reihenfolge",
+      "meldungen": [
+        "REIHENFOLGE: Die Quell-Reihenfolge wirkt unlogisch (Zickzack). Eine X-then-Y-Sortierung waere um 43% kuerzer. Die Reihenfolge wurde EXAKT aus der Quelle uebernommen und NICHT geaendert - am Laser pruefen, ob die alte Reihenfolge wirklich gewollt ist."
+      ],
+      "stand": "2026-08-20"
+    },
+    "MC491-02": {
+      "ase_nr": "A36A9053",
+      "typ": "reihenfolge",
+      "meldungen": [
+        "REIHENFOLGE: Die Quell-Reihenfolge wirkt unlogisch (Zickzack). Eine X-then-Y-Sortierung waere um 43% kuerzer. Die Reihenfolge wurde EXAKT aus der Quelle uebernommen und NICHT geaendert - am Laser pruefen, ob die alte Reihenfolge wirklich gewollt ist."
+      ],
+      "stand": "2026-08-20"
     },
     "PO336-01": {
       "ase_nr": "A45A1793",
       "typ": "reihenfolge",
-      "stand": "2026-08-20",
       "meldungen": [
         "REIHENFOLGE: Die Quell-Reihenfolge wirkt unlogisch (Zickzack). Eine X-then-Y-Sortierung waere um 44% kuerzer. Die Reihenfolge wurde EXAKT aus der Quelle uebernommen und NICHT geaendert - am Laser pruefen, ob die alte Reihenfolge wirklich gewollt ist."
-      ]
+      ],
+      "stand": "2026-08-20"
     }
   }
 }
