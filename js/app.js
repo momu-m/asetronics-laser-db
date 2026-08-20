@@ -360,8 +360,13 @@ async function renderProdukteTabelle(produkte) {
               escapeHtml(warnungen[p.bezeichnung].meldungen.join(' | ')) +
               '">WARNUNG</span>'
             : '';
+        // Graues ARCHIV-Badge fuer archivierte Produkte (21.08.2026)
+        const istArchiviert = !!p.archiviert_am;
+        const archivBadge = istArchiviert
+            ? ' <span class="badge badge-archiv">ARCHIV</span>'
+            : '';
         return `
-        <tr class="clickable produkte-row${hatWarnung ? ' row-warnung' : ''}"
+        <tr class="clickable produkte-row${hatWarnung ? ' row-warnung' : ''}${istArchiviert ? ' row-archiv' : ''}"
             data-produkt-id="${escapeHtml(p.id)}">
             <td><strong>${escapeHtml(p.bezeichnung)}</strong>${warnungBadge}</td>
             <td class="mono">${escapeHtml(p.ase_materialnr) || '-'}</td>
@@ -375,7 +380,7 @@ async function renderProdukteTabelle(produkte) {
                 ${escapeHtml(p.variablen_typ) || '-'}
             </td>
             <td>
-                <span class="${getStatusBadgeClass(p.status)}">${escapeHtml(p.status)}</span>
+                <span class="${getStatusBadgeClass(p.status)}">${escapeHtml(p.status)}</span>${archivBadge}
             </td>
             <td>${formatDate(p.erstellt_am)}</td>
         </tr>`;
@@ -401,6 +406,19 @@ function filterProdukte() {
         document.getElementById('var-filter').value : '';
 
     let gefiltert = window.alleProdukte || [];
+
+    // Geloeschte Produkte (Papierkorb) erscheinen NIE in der normalen
+    // Liste. Sie bleiben nur im Admin-Bereich "Verwaltung" sichtbar
+    // und koennen dort wiederhergestellt werden (Soft-Delete, 21.08.2026).
+    gefiltert = gefiltert.filter(p => !p.geloescht_am);
+
+    // Archiv-Filter (Checkbox "Archiv anzeigen"):
+    // Standardmaessig sind archivierte Produkte ausgeblendet.
+    // Mit gesetzter Checkbox werden sie mit eingeblendet (mit Badge).
+    const archivFilter = document.getElementById('archiv-filter');
+    if (!archivFilter || !archivFilter.checked) {
+        gefiltert = gefiltert.filter(p => !p.archiviert_am);
+    }
 
     // Nach Bezeichnung/Materialnummer suchen
     if (suchbegriff) {
@@ -722,6 +740,12 @@ function renderDetail(produkt, programme, positionen) {
     // Beschluss 10.08.2026: Mo will visuell sehen, ob die Positionen
     // plausibel sind. Verdächtige Muster werden farblich markiert.
     renderVorschau(produkt, positionen);
+
+    // Hook fuer admin.js (21.08.2026): initialisiert Bearbeiten-Buttons,
+    // Kommentare und Aenderungshistorie, sobald das Produkt da ist.
+    if (typeof window.nachProduktGeladen === 'function') {
+        window.nachProduktGeladen(produkt);
+    }
 }
 
 /**
@@ -1373,8 +1397,12 @@ async function ladeAdminHeader(session) {
 
     // Anfragen-Link anzeigen und Anzahl laden
     const link = document.getElementById('anfragen-link');
-    if (!link) return;
-    link.style.display = 'inline-flex';
+    if (link) link.style.display = 'inline-flex';
+
+    // Verwaltungs-Link (Archiv, Papierkorb, Audit-Log) fuer Admins
+    // zeigen (21.08.2026). Fuer Nicht-Admins bleibt er versteckt.
+    const verwaltungLink = document.getElementById('verwaltung-link');
+    if (verwaltungLink) verwaltungLink.style.display = 'inline-flex';
 
     const client = initSupabase();
     if (!client) return;
