@@ -32,7 +32,9 @@
 
 // Name des Caches. Wenn sich Dateien aendern, muss die Versionsnummer
 // hochgezaehlt werden (z.B. auf v2), damit alte Caches geloescht werden.
-const CACHE_NAME = 'alpa-cache-v1';
+// v2 (21.08.2026): Neue Dateien admin.js, theme.js, verwaltung.html,
+//                  variablen.html, qualifikation.html + Dark-Mode-CSS.
+const CACHE_NAME = 'alpa-cache-v2';
 
 // Liste aller Dateien, die beim Installieren vorgeladen (gecacht)
 // werden sollen. Diese muessen alle erfolgreich ladbar sein, sonst
@@ -45,8 +47,13 @@ const PRECACHE_URLS = [
     './rechner.html',                                      // DMC-Rechner
     './anfragen.html',                                     // Anfrage-Formular
     './register.html',                                     // Registrierung
-    './css/styles.css',                                    // Stylesheet
+    './variablen.html',                                    // Variablen-Uebersicht
+    './qualifikation.html',                                // Ruest-Assistent
+    './verwaltung.html',                                   // Admin: Archiv/Papierkorb/Log
+    './css/styles.css',                                    // Stylesheet (mit Dark-Mode)
     './js/app.js',                                         // App-Logik
+    './js/admin.js',                                       // Admin-Bearbeitung
+    './js/theme.js',                                       // Dark-Mode-Umschalter
     './js/rechner.js',                                     // DMC-Rechner-Logik
     './config.js',                                         // Supabase-Konfig
     'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',  // Supabase-SDK
